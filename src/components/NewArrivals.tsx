@@ -1,10 +1,11 @@
+import { homepageContent } from "../data/homepage";
+import { content } from "../constants/content";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { motion, type Variants } from "framer-motion";
 import { BIKES, TLD, type Bike, type Part } from "../data";
 import { HOME_HIGHLIGHTS } from "../data/highlights";
 import SmartImage from "./SmartImage";
-import { content } from "../constants/content";
 
 type NewItem = {
   id: string;
@@ -60,14 +61,14 @@ export default function NewArrivals({ go }: { go: (p: string, id?: string) => vo
         <div className="mb-7 flex flex-wrap items-end justify-between gap-4 border-t border-black/15 pt-4 dark:border-white/15 sm:mb-10">
           <div>
             <p className="fluid-eyebrow mb-2 font-bold uppercase text-[#98741b] dark:text-[#ffd100]">
-              {content.accueil.nouveautes.surTitre}
+              {homepageContent.nouveautes.surTitre}
             </p>
             <h2 className="fluid-h2 font-display font-semibold text-[#171816] dark:text-[#f2f0ea]">
-              {content.accueil.nouveautes.titre}
+              {homepageContent.nouveautes.titre}
             </h2>
           </div>
           <p className="fluid-body max-w-sm text-black/55 dark:text-white/55">
-            {content.accueil.nouveautes.description}
+            {homepageContent.nouveautes.description}
           </p>
         </div>
 
@@ -88,7 +89,7 @@ export default function NewArrivals({ go }: { go: (p: string, id?: string) => vo
               <button
                 onClick={() => go(product.targetPage, product.targetId ?? product.id)}
                 className="fb-stage-white relative block aspect-[16/10] overflow-hidden text-left"
-                aria-label={`${content.accueil.nouveautes.decouvrirPrefix} ${product.title}`}
+                aria-label={`${homepageContent.nouveautes.decouvrirPrefix} ${product.title}`}
               >
                 <SmartImage
                   src={product.image}
@@ -119,7 +120,7 @@ export default function NewArrivals({ go }: { go: (p: string, id?: string) => vo
 
                 <div className="mt-5 flex items-center justify-between border-t border-black/15 pt-3 dark:border-white/15">
                   <div>
-                    <p className="text-[9px] uppercase tracking-[0.14em] text-black/45 dark:text-white/45">{content.accueil.nouveautes.tarif}</p>
+                    <p className="text-[9px] uppercase tracking-[0.14em] text-black/45 dark:text-white/45">{homepageContent.nouveautes.tarif}</p>
                     <p className="mt-0.5 text-xs font-semibold text-[#171816] dark:text-[#f2f0ea]">{product.price}</p>
                   </div>
                   <button
@@ -139,7 +140,7 @@ export default function NewArrivals({ go }: { go: (p: string, id?: string) => vo
           onClick={() => go("catalogue")}
           className="mt-8 inline-flex items-center gap-2 border-b border-[#171816] pb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#171816] transition hover:border-[#98741b] hover:text-[#98741b] dark:border-[#f2f0ea] dark:text-[#f2f0ea] dark:hover:text-[#ffd100]"
         >
-          Parcourir le catalogue <FontAwesomeIcon icon={faArrowRight} />
+          {homepageContent.nouveautes.boutonCatalogue} <FontAwesomeIcon icon={faArrowRight} />
         </button>
       </div>
     </section>

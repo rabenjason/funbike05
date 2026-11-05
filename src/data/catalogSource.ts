@@ -5,7 +5,7 @@ import type {
   Category,
   Part,
   PartType,
-} from "./types";
+} from "../types/index";
 
 export type {
   AccessoryCategory,

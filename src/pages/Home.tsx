@@ -1,3 +1,4 @@
+import { homepageContent } from "../data/homepage";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -9,7 +10,8 @@ import {
   faMotorcycle,
   faShirt,
 } from "@fortawesome/free-solid-svg-icons";
-import { BIKES, BRANDS, CATEGORIES, TVS_ACCESSORIES, TVS_PARTS } from "../data";
+import { BIKES, BRANDS, TVS_ACCESSORIES, TVS_PARTS } from "../data";
+import { homepageCategories } from "../data/homepage";
 import { Section } from "../components/Layout";
 import { BikeCard, PartCard } from "../components/Cards";
 import { AccessoryBrandQuickLinks } from "../components/AccessoryBrands";
@@ -17,7 +19,6 @@ import ShercoBanner from "../components/ShercoBanner";
 import BrandExclusif from "../components/BrandExclusif";
 import NewArrivals from "../components/NewArrivals";
 import TypedText from "../components/TypedText";
-import { content } from "../constants/content";
 
 const FEATURED = [
   {
@@ -89,18 +90,18 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
           >
             <p className="fluid-eyebrow flex items-center gap-2 font-bold uppercase leading-snug text-white/75">
               <FontAwesomeIcon icon={faLocationDot} className="shrink-0 text-[#ffd100]" />
-              <span>{content.accueil.hero.localisation}</span>
+              <span>{homepageContent.hero.localisation}</span>
             </p>
             <h1 className="fluid-hero mt-4 max-w-xl text-balance font-display font-semibold text-white sm:mt-7">
-              {content.accueil.hero.titreLigne1}
-              <br className="hidden sm:inline" /> {content.accueil.hero.titreLigne2}
+              {homepageContent.hero.titreLigne1}
+              <br className="hidden sm:inline" /> {homepageContent.hero.titreLigne2}
             </h1>
             <p className="fluid-body mt-3.5 max-w-md text-pretty text-white/80 sm:mt-4">
-              {content.accueil.hero.description}
+              {homepageContent.hero.description}
             </p>
             <p className="fluid-body mt-3 flex items-center text-white/90">
-              {content.accueil.hero.sloganPrefix}&nbsp;
-              <TypedText strings={[...content.accueil.hero.usages]} className="font-semibold text-[#ffd100]" />
+              {homepageContent.hero.sloganPrefix}&nbsp;
+              <TypedText strings={[...homepageContent.hero.usages]} className="font-semibold text-[#ffd100]" />
             </p>
           </motion.div>
 
@@ -116,7 +117,7 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
               onClick={() => go("catalogue")}
               className="fluid-btn inline-flex min-h-12 w-full items-center justify-center gap-3 bg-[#ffd100] px-5 py-3 text-center font-bold uppercase text-[#171816] transition active:scale-[0.98] hover:bg-white sm:min-h-11 sm:w-auto"
             >
-              {content.accueil.hero.boutonCatalogue} <FontAwesomeIcon icon={faArrowRight} className="shrink-0" />
+              {homepageContent.hero.boutonCatalogue} <FontAwesomeIcon icon={faArrowRight} className="shrink-0" />
             </button>
             <button
               onClick={() => go("product", current.id)}
@@ -137,9 +138,9 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.25 }}
                 >
-                  <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#ffd100]">{content.accueil.hero.aLaUne} / {current.brand}</p>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#ffd100]">{homepageContent.hero.aLaUne} / {current.brand}</p>
                   <p className="mt-0.5 truncate font-display text-sm font-semibold sm:mt-1 sm:text-base">
-                    {current.short} · {content.accueil.hero.annee}
+                    {current.short} · {homepageContent.hero.annee}
                   </p>
                 </motion.div>
               </AnimatePresence>
@@ -148,12 +149,12 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
               <span className="font-display text-[11px] font-semibold text-white/70 sm:mr-1 sm:text-xs">
                 0{activeHero + 1}
               </span>
-              <div className="flex items-center" aria-label={content.accueil.hero.choisirModele}>
+              <div className="flex items-center" aria-label={homepageContent.hero.choisirModele}>
                 {FEATURED.map((item, index) => (
                   <button
                     key={item.id}
                     onClick={() => setActiveHero(index)}
-                    aria-label={`${content.accueil.hero.afficherModele} ${item.short}`}
+                    aria-label={`${homepageContent.hero.afficherModele} ${item.short}`}
                     aria-pressed={activeHero === index}
                     className="group grid h-11 w-8 place-items-center px-1.5 sm:h-9"
                   >
@@ -172,14 +173,14 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
         <div className="grid gap-5 border-t border-black/15 pt-4 dark:border-white/15 sm:grid-cols-[0.75fr_1.25fr] sm:gap-8">
           <div>
             <p className="fluid-eyebrow mb-2 font-bold uppercase text-[#98741b] dark:text-[#ffd100]">
-              {content.accueil.univers.surTitre}
+              {homepageContent.univers.surTitre}
             </p>
             <h2 className="fluid-h2 font-display font-semibold text-[#171816] dark:text-[#f2f0ea]">
-              {content.accueil.univers.titre}
+              {homepageContent.univers.titre}
             </h2>
           </div>
             <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
-            {CATEGORIES.map((category, index) => (
+            {homepageCategories.map((category, index) => (
               <motion.button
                 key={category.title}
                 onClick={() => go(category.to, category.brand)}
@@ -203,9 +204,9 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
       <NewArrivals go={go} />
 
       <Section
-        title={content.accueil.motos.titre}
-        subtitle={content.accueil.motos.description}
-        number={content.accueil.motos.numero}
+        title={homepageContent.motos.titre}
+        subtitle={homepageContent.motos.description}
+        number={homepageContent.motos.numero}
       >
         <div className="grid gap-x-5 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 lg:gap-x-8">
           {FEATURED.map((featured) => {
@@ -217,7 +218,7 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
           onClick={() => go("motos")}
           className="mt-8 inline-flex items-center gap-2 border-b border-[#171816] pb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#171816] transition hover:border-[#98741b] hover:text-[#98741b] dark:border-[#f2f0ea] dark:text-[#f2f0ea] dark:hover:text-[#ffd100]"
         >
-          {content.accueil.motos.bouton} <FontAwesomeIcon icon={faArrowRight} />
+          {homepageContent.motos.bouton} <FontAwesomeIcon icon={faArrowRight} />
         </button>
       </Section>
 
@@ -225,13 +226,13 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
         <div className="mx-auto w-full max-w-(--container-site) px-4 py-10 sm:px-7 sm:py-12 lg:px-10 lg:py-14">
           <div className="mb-6 flex flex-wrap items-end justify-between gap-4 border-t border-black/15 pt-4 dark:border-white/15 sm:mb-7">
             <div>
-              <p className="fluid-eyebrow mb-2 font-bold uppercase text-[#98741b] dark:text-[#ffd100]">{content.accueil.atelier.surTitre}</p>
+              <p className="fluid-eyebrow mb-2 font-bold uppercase text-[#98741b] dark:text-[#ffd100]">{homepageContent.atelier.surTitre}</p>
               <h2 className="fluid-h2 font-display font-semibold text-[#171816] dark:text-[#f2f0ea]">
-                {content.accueil.atelier.titre}
+                {homepageContent.atelier.titre}
               </h2>
             </div>
             <p className="fluid-body max-w-sm text-black/55 dark:text-white/55">
-              {content.accueil.atelier.description}
+              {homepageContent.atelier.description}
             </p>
           </div>
 
@@ -252,7 +253,7 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
             onClick={() => go("equipements")}
           className="mt-8 inline-flex items-center gap-2 border-b border-[#171816] pb-1 text-[10px] font-bold uppercase tracking-[0.14em] text-[#171816] transition hover:border-[#98741b] hover:text-[#98741b] dark:border-[#f2f0ea] dark:text-[#f2f0ea] dark:hover:text-[#ffd100]"
           >
-            {content.accueil.atelier.bouton} <FontAwesomeIcon icon={faArrowRight} />
+            {homepageContent.atelier.bouton} <FontAwesomeIcon icon={faArrowRight} />
           </button>
         </div>
       </section>
@@ -260,8 +261,8 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
       <section className="glass-header overflow-hidden border-y border-white/70 py-10 dark:border-white/10">
         <div className="mx-auto w-full max-w-(--container-site) px-4 sm:px-7 lg:px-10">
           <div className="mb-5 flex items-center justify-between border-t border-black/15 pt-3 dark:border-white/15">
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-black/45 dark:text-white/45">{content.accueil.partenaires.titre}</p>
-            <span className="text-[9px] uppercase tracking-[0.16em] text-black/35 dark:text-white/35">{content.accueil.partenaires.description}</span>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-black/45 dark:text-white/45">{homepageContent.partenaires.titre}</p>
+            <span className="text-[9px] uppercase tracking-[0.16em] text-black/35 dark:text-white/35">{homepageContent.partenaires.description}</span>
           </div>
           <div className="group/marquee relative overflow-hidden">
             {/* Fade edges so logos slide in and out smoothly */}
@@ -284,7 +285,7 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
                 >
                   <img
                     src={brand.src}
-                    alt={`${content.accueil.partenaires.logoPrefix} ${brand.name}`}
+                    alt={`${homepageContent.partenaires.logoPrefix} ${brand.name}`}
                     loading="lazy"
                     className="partner-logo h-full w-full object-contain transition-opacity hover:opacity-100"
                   />

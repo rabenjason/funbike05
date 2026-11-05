@@ -1,8 +1,8 @@
+import { homepageContent } from "../data/homepage";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import { motion, useInView, type Variants } from "framer-motion";
 import { useRef } from "react";
-import { content } from "../constants/content";
 
 /** Parent: reveals its children one after the other when scrolled into view */
 const group: Variants = {
@@ -35,7 +35,7 @@ export default function ShercoBanner({ go }: { go: (page: string, id?: string) =
     <section className="relative isolate min-h-[330px] overflow-hidden bg-[#1a1b18] sm:min-h-[440px]">
       <motion.img
         src="https://www.sherco.com/wp-content/uploads/SHERCO50ccV2-32.jpg"
-        alt={content.accueil.sherco.imageAlt}
+        alt={homepageContent.sherco.imageAlt}
         loading="lazy"
         initial={{ scale: 1.035 }}
         whileInView={{ scale: 1 }}
@@ -56,17 +56,17 @@ export default function ShercoBanner({ go }: { go: (page: string, id?: string) =
           className="max-w-xl"
         >
           <motion.p variants={fromLeft} className="fluid-eyebrow font-bold uppercase text-[#ffd100]">
-            {content.accueil.sherco.surTitre}
+            {homepageContent.sherco.surTitre}
           </motion.p>
 
           <motion.h2 variants={fromLeft} className="fluid-h1 mt-3 font-display font-semibold text-white">
-            {content.accueil.sherco.titreLigne1}
+            {homepageContent.sherco.titreLigne1}
             <br />
-            {content.accueil.sherco.titreLigne2}
+            {homepageContent.sherco.titreLigne2}
           </motion.h2>
 
           <motion.p variants={fromLeft} className="fluid-body mt-3 max-w-md text-white/80">
-            {content.accueil.sherco.description}
+            {homepageContent.sherco.description}
           </motion.p>
 
           <motion.button
@@ -74,7 +74,7 @@ export default function ShercoBanner({ go }: { go: (page: string, id?: string) =
             onClick={() => go("motos")}
             className="fluid-btn mt-5 inline-flex items-center gap-3 border-b border-[#ffd100] pb-2 font-bold uppercase text-white transition hover:text-[#ffd100]"
           >
-            {content.accueil.sherco.bouton} <FontAwesomeIcon icon={faArrowRight} />
+            {homepageContent.sherco.bouton} <FontAwesomeIcon icon={faArrowRight} />
           </motion.button>
         </motion.div>
       </div>
