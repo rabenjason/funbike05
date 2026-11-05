@@ -1,4 +1,5 @@
-import { BIKES, type Bike } from "../data";
+import { motorcycles, brands } from "../data";
+import type { Product } from "../types/product";
 import type { ChatAction } from "./assistant";
 
 /* ------------------------------------------------------------------ */
@@ -337,9 +338,9 @@ function nextQuestion(p: NeedProfile): Question | null {
 /*  Matching                                                           */
 /* ------------------------------------------------------------------ */
 
-type Match = { bike: Bike; score: number; pitch: string };
+type Match = { bike: Product; score: number; pitch: string };
 
-function scoreBike(bike: Bike, p: NeedProfile): number {
+function scoreBike(bike: Product, p: NeedProfile): number {
   const tags = TAGS[bike.id];
   if (!tags) return 0;
   let score = 0;
@@ -353,8 +354,8 @@ function scoreBike(bike: Bike, p: NeedProfile): number {
 }
 
 export function recommend(p: NeedProfile, brand?: string): Match[] {
-  let pool = BIKES.filter((b) => TAGS[b.id]);
-  if (brand) pool = pool.filter((b) => b.brand === brand || b.brand === "Funbike");
+  let pool = motorcycles.filter((product) => TAGS[product.id]);
+  if (brand) pool = pool.filter((product) => brands.find((item) => item.id === product.brandId)?.name === brand || product.brandId === "funbike");
 
   // Primary criterion: the usage must match (when the client told us the usage).
   if (p.usage) pool = pool.filter((b) => TAGS[b.id].usage.includes(p.usage as Usage));

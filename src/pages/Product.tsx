@@ -2,7 +2,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight, faCheck, faMagnifyingGlassPlus, faPhone } from "@fortawesome/free-solid-svg-icons";
-import { BIKES } from "../data";
+import { brands, motorcycles, productGallery, mainProductImage } from "../data";
 import { Section } from "../components/Layout";
 import { BikeCard } from "../components/Cards";
 import SmartImage from "../components/SmartImage";
@@ -20,11 +20,12 @@ export default function Product({
   canGoBack?: boolean;
   backLabel?: string;
 }) {
-  const bike = BIKES.find((item) => item.id === id) ?? BIKES[0];
-  const gallery = bike.gallery ?? [bike.image];
+  const bike = motorcycles.find((item) => item.id === id) ?? motorcycles[0];
+  const gallery = productGallery(bike);
+  const brand = brands.find((item) => item.id === bike.brandId)?.name ?? "Marque non renseignée";
   const [active, setActive] = useState(0);
   const [viewerOpen, setViewerOpen] = useState(false);
-  const related = BIKES.filter((item) => item.id !== bike.id && item.family === bike.family).slice(0, 4);
+  const related = motorcycles.filter((item) => item.id !== bike.id && item.family === bike.family).slice(0, 4);
 
   return (
     <div className="overflow-x-hidden bg-white dark:bg-[#141513]">
@@ -49,13 +50,13 @@ export default function Product({
           >
             <SmartImage
               src={gallery[active]}
-              alt={bike.alt}
+              alt={mainProductImage(bike)?.altText ?? bike.name}
               eager
               className="h-full w-full"
               imgClassName="object-contain p-3 transition-transform duration-500 group-hover:scale-[1.025] sm:p-5"
             />
             <span className="absolute bottom-3 left-3 max-w-[calc(100%-1.5rem)] truncate border border-white/60 bg-white/90 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.12em] text-[#171816] shadow-sm backdrop-blur-xl sm:bottom-5 sm:left-5 sm:tracking-[0.14em]">
-              {bike.brand} / {bike.family}
+              {brand} / {bike.family}
             </span>
             <span className="absolute right-3 top-3 inline-flex min-h-9 items-center gap-2 rounded-full border border-black/10 bg-white/85 px-3 text-[10px] font-bold uppercase tracking-[0.1em] text-[#171816] shadow-sm backdrop-blur transition group-hover:bg-white dark:border-white/10 dark:bg-black/55 dark:text-white dark:group-hover:bg-black/75">
               <FontAwesomeIcon icon={faMagnifyingGlassPlus} />
@@ -86,18 +87,18 @@ export default function Product({
           className="min-w-0 lg:col-span-5 lg:py-4"
         >
           <p className="fluid-eyebrow break-words font-bold uppercase leading-relaxed text-[#98741b] dark:text-[#ffd100]">
-            {bike.brand} / {bike.family} {bike.tag ? `/ ${bike.tag}` : ""}
+            {brand} / {bike.family} {bike.badge ? `/ ${bike.badge}` : ""}
           </p>
           <h1 className="fluid-h1 mt-2.5 break-words font-display font-semibold text-[#171816] [overflow-wrap:anywhere] dark:text-[#f2f0ea] sm:mt-3">
             {bike.name}
           </h1>
-          <p className="fluid-body mt-3.5 max-w-xl text-pretty text-black/60 dark:text-white/60 sm:mt-4">{bike.desc}</p>
+          <p className="fluid-body mt-3.5 max-w-xl text-pretty text-black/60 dark:text-white/60 sm:mt-4">{bike.description}</p>
 
           <dl className="mt-6 min-w-0 border-t border-black/15 dark:border-white/15 sm:mt-7">
-            {bike.specs.map((spec, index) => (
-              <div key={spec.label} className="grid min-w-0 grid-cols-[1.75rem_minmax(0,0.85fr)_minmax(0,1.15fr)] items-center gap-1.5 border-b border-black/15 py-3 dark:border-white/15 sm:grid-cols-[2.2rem_1fr_1.2fr] sm:gap-2">
+            {bike.specifications.map((spec, index) => (
+              <div key={spec.key} className="grid min-w-0 grid-cols-[1.75rem_minmax(0,0.85fr)_minmax(0,1.15fr)] items-center gap-1.5 border-b border-black/15 py-3 dark:border-white/15 sm:grid-cols-[2.2rem_1fr_1.2fr] sm:gap-2">
                 <span className="font-display text-[10px] text-black/35 dark:text-white/35">0{index + 1}</span>
-                <dt className="min-w-0 break-words text-[9px] font-bold uppercase leading-4 tracking-[0.07em] text-black/50 dark:text-white/50 sm:text-[10px] sm:tracking-[0.1em]">{spec.label}</dt>
+                <dt className="min-w-0 break-words text-[9px] font-bold uppercase leading-4 tracking-[0.07em] text-black/50 dark:text-white/50 sm:text-[10px] sm:tracking-[0.1em]">{spec.key}</dt>
                 <dd className="min-w-0 break-words text-right text-[11px] font-semibold leading-4 text-[#171816] dark:text-[#f2f0ea] sm:text-xs">{spec.value}</dd>
               </div>
             ))}
@@ -111,7 +112,7 @@ export default function Product({
                   Prix & disponibilité
                 </p>
                 <p className="mt-1 font-display text-[clamp(1.25rem,1.1rem+0.6vw,1.65rem)] font-semibold leading-none text-[#171816] dark:text-[#f2f0ea]">
-                  {bike.price}
+                  {bike.price ?? "Sur devis"}
                 </p>
               </div>
 
@@ -144,7 +145,7 @@ export default function Product({
               </button>
             </div>
           </section>
-          {bike.brand === "TVS" && (
+          {bike.brandId === "tvs" && (
             <button
               type="button"
               onClick={() => go("equipements", "tvs")}

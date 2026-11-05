@@ -1,47 +1,28 @@
-import { homepageContent } from "../data/homepage";
+import { homepageContent, homepageHighlights } from "../data/homepage";
 import { content } from "../constants/content";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { motion, type Variants } from "framer-motion";
-import { BIKES, TLD, type Bike, type Part } from "../data";
-import { HOME_HIGHLIGHTS } from "../data/highlights";
+import { findProductById, mainProductImage } from "../data";
+import type { Product } from "../types/product";
 import SmartImage from "./SmartImage";
 
-type NewItem = {
-  id: string;
+type FeaturedProduct = {
+  product: Product;
   badge: string;
   eyebrow: string;
-  title: string;
-  desc: string;
-  image: string;
-  alt: string;
   bullets: string[];
-  price: string;
   targetPage: "product" | "equipements";
   targetId?: string;
 };
 
-const ITEMS: NewItem[] = HOME_HIGHLIGHTS.flatMap((highlight) => {
-  const bike: Bike | undefined = BIKES.find((item) => item.id === highlight.productId);
-  const accessory: Part | undefined = TLD.find((item) => item.id === highlight.productId);
-  const product = bike ?? accessory;
+const ITEMS: FeaturedProduct[] = homepageHighlights.flatMap((highlight) => {
+  const product = findProductById(highlight.productId);
   if (!product) {
     console.warn(`Produit mis en avant introuvable : ${highlight.productId}`);
     return [];
   }
-  return [{
-    id: product.id,
-    badge: highlight.badge,
-    eyebrow: highlight.eyebrow,
-    title: bike?.name ?? product.name,
-    desc: bike?.desc ?? product.desc ?? "Découvrez ce produit dans notre gamme d'équipements.",
-    image: product.image,
-    alt: bike?.alt ?? product.name,
-    bullets: highlight.bullets,
-    price: product.price,
-    targetPage: highlight.targetPage,
-    targetId: highlight.targetId,
-  }];
+  return [{ product, badge: highlight.badge, eyebrow: highlight.eyebrow, bullets: highlight.bullets, targetPage: highlight.targetPage, targetId: highlight.targetId }];
 });
 
 const list: Variants = {
@@ -86,21 +67,21 @@ export default function NewArrivals({ go }: { go: (p: string, id?: string) => vo
           viewport={{ once: true, amount: 0.12 }}
           className="grid gap-x-5 gap-y-8 sm:grid-cols-2 md:grid-cols-3 md:gap-x-6 lg:gap-x-8"
         >
-          {ITEMS.map((product) => (
+          {ITEMS.map((featured) => (
             <motion.article
-              key={product.title}
+              key={featured.product.id}
               variants={itemMotion}
               whileHover={{ y: -5 }}
               className="fb-card group flex min-w-0 flex-col p-2.5 sm:p-3"
             >
               <button
-                onClick={() => go(product.targetPage, product.targetId ?? product.id)}
+                onClick={() => go(featured.targetPage, featured.targetId ?? featured.product.id)}
                 className="fb-stage-white relative block aspect-[16/10] overflow-hidden text-left"
-                aria-label={`${homepageContent.nouveautes.decouvrirPrefix} ${product.title}`}
+                aria-label={`${homepageContent.nouveautes.decouvrirPrefix} ${featured.product.name}`}
               >
                 <SmartImage
-                  src={product.image}
-                  alt={product.alt}
+                  src={mainProductImage(featured.product)?.url ?? ""}
+                  alt={mainProductImage(featured.product)?.altText ?? featured.product.name}
                   className="absolute inset-0"
                   imgClassName="object-contain p-2 transition-transform duration-500 group-hover:scale-[1.035]"
                 />
@@ -109,15 +90,15 @@ export default function NewArrivals({ go }: { go: (p: string, id?: string) => vo
 
               <div className="flex flex-1 flex-col pt-4">
                 <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-black/50 dark:text-white/55">
-                  {product.eyebrow}
+                  {featured.eyebrow}
                 </p>
                 <h3 className="fluid-h3 mt-1 font-display font-semibold text-[#171816] dark:text-[#f2f0ea]">
-                  {product.title}
+                  {featured.product.name}
                 </h3>
-                <p className="mt-2 text-xs leading-5 text-black/55 dark:text-white/55">{descriptionPreview(product.desc)}</p>
+                <p className="mt-2 text-xs leading-5 text-black/55 dark:text-white/55">{descriptionPreview(featured.product.description)}</p>
 
                 <ul className="mt-4 grid grid-cols-1 gap-y-1.5">
-                  {product.bullets.map((feature) => (
+                  {featured.bullets.map((feature) => (
                     <li key={feature} className="flex items-center gap-2 text-[11px] text-black/70 dark:text-white/70">
                       <FontAwesomeIcon icon={faCheck} className="text-[9px] text-black/45 dark:text-white/55" />
                       {feature}
@@ -128,10 +109,10 @@ export default function NewArrivals({ go }: { go: (p: string, id?: string) => vo
                 <div className="mt-5 flex items-center justify-between border-t border-black/15 pt-3 dark:border-white/15">
                   <div>
                     <p className="text-[9px] uppercase tracking-[0.14em] text-black/45 dark:text-white/45">{homepageContent.nouveautes.tarif}</p>
-                    <p className="mt-0.5 text-xs font-semibold text-[#171816] dark:text-[#f2f0ea]">{product.price}</p>
+                    <p className="mt-0.5 text-xs font-semibold text-[#171816] dark:text-[#f2f0ea]">{featured.product.price ?? "Sur devis"}</p>
                   </div>
                   <button
-                    onClick={() => go(product.targetPage, product.targetId ?? product.id)}
+                    onClick={() => go(featured.targetPage, featured.targetId ?? featured.product.id)}
                     className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[#171816] transition hover:text-black/60 dark:text-[#f2f0ea] dark:hover:text-white/70"
                   >
                     {content.boutons.voirProduit}

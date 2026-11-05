@@ -1,2 +1,3 @@
-import { allAccessoryProducts } from "./build";
-export const accessories = allAccessoryProducts.filter((product) => product.categoryId === "accessoires");
+import type { Product } from "../../types/product";
+
+export const accessories: Product[] = [];
