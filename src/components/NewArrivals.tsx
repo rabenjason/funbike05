@@ -1,7 +1,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { motion, type Variants } from "framer-motion";
-import { BIKES } from "../data";
+import { BIKES, TLD, type Bike, type Part } from "../data";
+import { HOME_HIGHLIGHTS } from "../data/highlights";
 import SmartImage from "./SmartImage";
 import { content } from "../constants/content";
 
@@ -15,24 +16,32 @@ type NewItem = {
   alt: string;
   bullets: string[];
   price: string;
+  targetPage: "product" | "equipements";
+  targetId?: string;
 };
 
-const bike = (id: string) => BIKES.find((item) => item.id === id)!;
-
-const ITEMS: NewItem[] = content.accueil.nouveautes.items.map((item) => ({
-  id: item.id,
-  badge: item.badge,
-  eyebrow: item.surTitre,
-  title: item.titre,
-  desc: item.description,
-  image:
-    item.id === "tld"
-      ? "https://troyleedesigns.eu/cdn/shop/files/TLD_M26D2_GPPRO_PULSE_BLACK_01.jpg?v=1785777688&width=533"
-      : bike(item.id).image,
-  alt: item.alt,
-  bullets: [...item.points],
-  price: item.prix,
-}));
+const ITEMS: NewItem[] = HOME_HIGHLIGHTS.flatMap((highlight) => {
+  const bike: Bike | undefined = BIKES.find((item) => item.id === highlight.productId);
+  const accessory: Part | undefined = TLD.find((item) => item.id === highlight.productId);
+  const product = bike ?? accessory;
+  if (!product) {
+    console.warn(`Produit mis en avant introuvable : ${highlight.productId}`);
+    return [];
+  }
+  return [{
+    id: product.id,
+    badge: highlight.badge,
+    eyebrow: highlight.eyebrow,
+    title: bike?.name ?? product.name,
+    desc: bike?.desc ?? product.desc ?? "Découvrez ce produit dans notre gamme d'équipements.",
+    image: product.image,
+    alt: bike?.alt ?? product.name,
+    bullets: highlight.bullets,
+    price: product.price,
+    targetPage: highlight.targetPage,
+    targetId: highlight.targetId,
+  }];
+});
 
 const list: Variants = {
   hidden: {},
@@ -77,7 +86,7 @@ export default function NewArrivals({ go }: { go: (p: string, id?: string) => vo
               className="fb-card group flex min-w-0 flex-col p-2.5 sm:p-3"
             >
               <button
-                onClick={() => go(product.id === "tld" ? "equipements" : "product", product.id)}
+                onClick={() => go(product.targetPage, product.targetId ?? product.id)}
                 className="fb-stage-white relative block aspect-[16/10] overflow-hidden text-left"
                 aria-label={`${content.accueil.nouveautes.decouvrirPrefix} ${product.title}`}
               >
@@ -114,7 +123,7 @@ export default function NewArrivals({ go }: { go: (p: string, id?: string) => vo
                     <p className="mt-0.5 text-xs font-semibold text-[#171816] dark:text-[#f2f0ea]">{product.price}</p>
                   </div>
                   <button
-                    onClick={() => go(product.id === "tld" ? "equipements" : "product", product.id)}
+                    onClick={() => go(product.targetPage, product.targetId ?? product.id)}
                     className="inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.12em] text-[#171816] transition hover:text-black/60 dark:text-[#f2f0ea] dark:hover:text-white/70"
                   >
                     {content.boutons.voirProduit}
