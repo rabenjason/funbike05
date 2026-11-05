@@ -45,7 +45,7 @@ export type Motorcycle = Bike;
 
 export type AccessoryCategory = "Casques" | "Blousons" | "Gants" | "Bottes" | "Pièces";
 export type PartType = "Pneus" | "Freinage" | "Transmission" | "Filtration" | "Pièces moteur" | "Consommables";
-export type AccessoryKind = "piece" | "tld" | "gaerne" | "mt" | "tvs";
+export type AccessoryKind = "piece" | "tld" | "gaerne" | "mt" | "tvs" | "bihr";
 export type CompatibleBrand = "Universal" | "TVS" | "Sherco" | "Fantic";
 
 export interface Part {

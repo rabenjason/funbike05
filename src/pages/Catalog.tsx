@@ -11,6 +11,7 @@ import {
   TLD,
   GAERNE,
   MT_HELMETS,
+  BIHR_DEMO_ITEMS,
   type AccessoryCategory,
   type Part,
   type PartType,
@@ -42,7 +43,7 @@ const GEAR_BY_BRAND: Record<AccessoryBrandKey, Part[]> = {
   gaerne: GAERNE,
   mt: MT_HELMETS,
   tvs: TVS_ACCESSORIES,
-  bihr: [],
+  bihr: BIHR_DEMO_ITEMS,
 };
 
 const TVS_CATEGORIES: ("Tous" | AccessoryCategory)[] = [
@@ -374,14 +375,21 @@ export function Equipements({ go, initialBrand }: { go: (p: string, id?: string)
             className="mt-8"
           >
             {isBihr ? (
-              <BrandInfoPanel
-                logo={ACCESSORY_BRANDS.find((b) => b.key === "bihr")!.logo!}
-                alt="Logo Bihr"
-                title="Équipements & accessoires Bihr"
-                text="Casques, tenues, bottes, gants et accessoires pilote Bihr : sélection et disponibilité à confirmer avec l'équipe Funbike."
-                lines={["Casques & tenues", "Bottes & gants", "Accessoires pilote"]}
-                go={go}
-              />
+              <>
+                <p className="mb-5 text-xs leading-5 text-black/55 dark:text-white/55">
+                  Sélection de démonstration avec visuels réutilisés. Références, tarifs et disponibilités BIHR à confirmer auprès de l'équipe Funbike.
+                </p>
+                <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
+                  {BIHR_DEMO_ITEMS.map((part) => (
+                    <PartCard
+                      key={part.id}
+                      part={part}
+                      go={(_page, id) => go("contact", id)}
+                      onEnquire={() => go("contact", part.id)}
+                    />
+                  ))}
+                </div>
+              </>
             ) : (
               <>
                 <div className="mb-5 flex flex-wrap items-end justify-between gap-3">

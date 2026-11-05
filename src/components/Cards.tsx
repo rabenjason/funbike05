@@ -96,6 +96,7 @@ function partEyebrow(part: Part): string {
   if (part.kind === "tld") return "Troy Lee Designs";
   if (part.kind === "gaerne") return "Gaerne";
   if (part.kind === "mt") return "MT Helmets";
+  if (part.kind === "bihr") return "BIHR";
   if (part.compatibleBrand && part.compatibleBrand !== "Universal") return `Pièce ${part.compatibleBrand}`;
   return "Pièce détachée";
 }
