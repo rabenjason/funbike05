@@ -121,7 +121,7 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
             </button>
             <button
               onClick={() => go("product", current.id)}
-              className="glass-panel fluid-btn inline-flex min-h-12 w-full items-center justify-center gap-3 border-white/40 bg-white/10 px-5 py-3 text-center font-bold uppercase text-white transition active:scale-[0.98] hover:border-[#ffd100] hover:text-[#ffd100] sm:min-h-11 sm:w-auto"
+              className="hero-secondary-cta glass-panel fluid-btn inline-flex min-h-12 w-full items-center justify-center gap-3 border-white/40 bg-white/10 px-5 py-3 text-center font-bold uppercase text-white transition active:scale-[0.98] hover:border-[#ffd100] hover:text-[#ffd100] sm:min-h-11 sm:w-auto"
             >
               <span className="truncate">{current.short}</span>
               <FontAwesomeIcon icon={faArrowRight} className="shrink-0" />
