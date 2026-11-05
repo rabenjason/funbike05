@@ -93,6 +93,7 @@
 @media (min-width: 640px) {
   :root:not(.dark) .dealer-city:hover,
   :root:not(.dark) .dealer-city[aria-selected="true"] {
+    background: transparent;
     color: #20211e;
   }
 }
