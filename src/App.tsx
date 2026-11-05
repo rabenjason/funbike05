@@ -11,6 +11,7 @@ import AccessoryDetail from "./pages/AccessoryDetail";
 import Contact from "./pages/Contact";
 import Dealers from "./pages/Dealers";
 import { BIKES, findPart } from "./data";
+import { persistTheme, readDarkPreference } from "./lib/theme";
 
 const FIRST_HERO =
   "https://funbike.mg/wp-content/uploads/2026/02/01-250-SEF-FACTORY-2026-3679x2456-1-1920x1080-1.jpg";
@@ -49,9 +50,7 @@ function routeLabel(route: Route): string {
 }
 
 export default function App() {
-  const [dark, setDark] = useState(
-    () => localStorage.getItem("fb-theme") !== "light",
-  );
+  const [dark, setDark] = useState(readDarkPreference);
   const [history, setHistory] = useState<Route[]>([{ page: "home" }]);
   const [booting, setBooting] = useState(true);
   const [cookieOpen, setCookieOpen] = useState(false);
@@ -67,7 +66,7 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
-    localStorage.setItem("fb-theme", dark ? "dark" : "light");
+    persistTheme(dark);
     document.querySelector<HTMLMetaElement>('meta[name="theme-color"]')?.setAttribute("content", dark ? "#141513" : "#ffffff");
   }, [dark]);
 

@@ -3,10 +3,10 @@ import { createRoot } from "react-dom/client";
 import "./index.css";
 import "./styles/light-theme.css";
 import App from "./App";
+import { readDarkPreference } from "./lib/theme";
 
-// Dark is the default brand experience. Apply it before React paints to avoid
-// a white flash; an explicit light-mode choice is always preserved.
-if (localStorage.getItem("fb-theme") !== "light") {
+// Apply the stored preference before React paints; first visit defaults to dark.
+if (readDarkPreference()) {
   document.documentElement.classList.add("dark");
 }
 
