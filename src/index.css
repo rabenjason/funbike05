@@ -103,12 +103,6 @@ svg {
   letter-spacing: 0.12em;
 }
 
-/* Page title bands stay compact; the first content section starts closer to
-   them than regular editorial sections. Applies to every catalogue surface. */
-.page-header + section {
-  padding-top: clamp(2rem, 1.6rem + 1.5vw, 3rem);
-}
-
 .dark body {
   background: #141513;
 }

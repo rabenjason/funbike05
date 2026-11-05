@@ -15,7 +15,7 @@ import {
   type Part,
   type PartType,
 } from "../data";
-import { PageHeader, Section } from "../components/Layout";
+import { Section } from "../components/Layout";
 import { BikeCard, PartCard } from "../components/Cards";
 import { BikeCardSkeleton, PartCardSkeleton } from "../components/Skeletons";
 import Pagination from "../components/Pagination";
@@ -198,10 +198,6 @@ export function Catalogue({
 
   return (
     <div>
-      <PageHeader
-        title={motosOnly ? "Catalogue Motos" : "Tout le Catalogue"}
-        subtitle={motosOnly ? "Performance, Aventure et Mobilité Urbaine." : "Découvrez nos motos, pièces et équipements officiels."}
-      />
 
       <Section
         title="Véhicules"
@@ -351,10 +347,6 @@ export function Equipements({ go, initialBrand }: { go: (p: string, id?: string)
 
   return (
     <div>
-      <PageHeader
-        title="Équipements Pilote"
-        subtitle="Protection, casques, tenues et accessoires pour le pilote."
-      />
       <Section
         title="Choisir une marque"
         subtitle="Touchez une marque pour afficher sa gamme et les informations utiles."
@@ -553,10 +545,6 @@ export function Spares({ go, initialBrand }: { go: (p: string, id?: string) => v
 
   return (
     <div>
-      <PageHeader
-        title="Pièces & Consommables"
-        subtitle="Pneus, kits chaîne, freinage, filtration et pièces mécaniques."
-      />
       <Section
         title="Choisir une marque"
         subtitle="Touchez une marque pour afficher ses pièces et consommables."
