@@ -54,6 +54,13 @@ const itemMotion: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: "easeOut" } },
 };
 
+const DESCRIPTION_LIMIT = 112;
+function descriptionPreview(description: string): string {
+  const characters = Array.from(description);
+  if (characters.length <= DESCRIPTION_LIMIT) return description;
+  return `${characters.slice(0, DESCRIPTION_LIMIT - 3).join("").trimEnd()}...`;
+}
+
 export default function NewArrivals({ go }: { go: (p: string, id?: string) => void }) {
   return (
     <section className="bg-white py-10 dark:bg-[#141513] sm:py-12 lg:py-14">
@@ -107,7 +114,7 @@ export default function NewArrivals({ go }: { go: (p: string, id?: string) => vo
                 <h3 className="fluid-h3 mt-1 font-display font-semibold text-[#171816] dark:text-[#f2f0ea]">
                   {product.title}
                 </h3>
-                <p className="mt-2 text-xs leading-5 text-black/55 dark:text-white/55">{product.desc}</p>
+                <p className="mt-2 text-xs leading-5 text-black/55 dark:text-white/55">{descriptionPreview(product.desc)}</p>
 
                 <ul className="mt-4 grid grid-cols-1 gap-y-1.5">
                   {product.bullets.map((feature) => (
