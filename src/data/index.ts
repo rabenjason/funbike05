@@ -5,6 +5,7 @@ export * from "./models";
 export * from "./products";
 export * from "./promotions";
 export * from "./homepage";
+export * from "./bihrDemo";
 
 // Compatibility views for existing UI while components migrate to Product.
 export {

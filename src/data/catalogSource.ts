@@ -767,6 +767,7 @@ export function partBrandLabel(part: Part): string {
   if (part.kind === "gaerne") return "Gaerne";
   if (part.kind === "mt") return "MT Helmets";
   if (part.kind === "tvs") return "TVS";
+  if (part.kind === "bihr") return "BIHR";
   if (part.compatibleBrand && part.compatibleBrand !== "Universal") return part.compatibleBrand;
   return "Universel";
 }
