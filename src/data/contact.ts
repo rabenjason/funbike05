@@ -1,8 +1,9 @@
 /**
- * Données centralisées de la page Contact.
+ * Coordonnées FunBike centralisées — source unique de vérité.
  *
- * Toutes les coordonnées affichées sur la page Contact proviennent de ce
- * fichier : modifier une information ici la met à jour sur la page Contact.
+ * Utilisé par la page Contact ET par le footer : modifier une information ici
+ * la met à jour automatiquement aux deux endroits. Ne créer aucune autre
+ * source de coordonnées (ne rien dupliquer ailleurs).
  * Conserver les valeurs existantes telles quelles — ne rien inventer.
  */
 

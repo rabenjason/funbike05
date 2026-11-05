@@ -20,6 +20,7 @@ import {
 import { AnimatePresence, motion } from "framer-motion";
 import { LOGO } from "../data";
 import { content } from "../constants/content";
+import { CONTACT_ADDRESS, CONTACT_EMAIL, CONTACT_HOURS, CONTACT_PHONE, CONTACT_PHONE_HREF } from "../data/contact";
 
 export type Route = { page: string; id?: string };
 
@@ -225,7 +226,7 @@ export function Footer({ go, onCookies }: { go: (p: string, id?: string) => void
             </motion.button>
             <motion.a
               whileTap={{ scale: 0.97 }}
-              href="tel:+261340000000"
+              href={CONTACT_PHONE_HREF}
               className="inline-flex min-h-12 w-full items-center justify-center gap-2.5 border border-white/20 bg-white/[0.03] px-5 py-3 text-[11px] font-bold uppercase tracking-[0.1em] text-white transition hover:border-[#ffd100] hover:text-[#ffd100] active:bg-white/10 sm:w-auto"
             >
               <FontAwesomeIcon icon={faPhone} className="shrink-0" />
@@ -322,30 +323,30 @@ export function Footer({ go, onCookies }: { go: (p: string, id?: string) => void
                 <span className="leading-snug">
                   {content.footer.showroom}
                   <br />
-                  <span className="text-white/50">{content.footer.adresse}</span>
+                  <span className="text-white/50">{CONTACT_ADDRESS}</span>
                 </span>
               </li>
               <li>
                 <a
-                  href="tel:+261340000000"
+                  href={CONTACT_PHONE_HREF}
                   className="flex min-h-10 items-center gap-3 text-white/85 transition hover:text-[#ffd100]"
                 >
                   <FontAwesomeIcon icon={faPhone} className="w-3.5 shrink-0 text-[#ffd100]" />
-                  <span className="font-semibold">{content.site.telephoneAffiche}</span>
+                  <span className="font-semibold">{CONTACT_PHONE}</span>
                 </a>
               </li>
               <li>
                 <a
-                  href="mailto:contact@funbike.mg"
+                  href={`mailto:${CONTACT_EMAIL}`}
                   className="flex min-h-10 items-center gap-3 text-white/85 transition hover:text-[#ffd100]"
                 >
                   <FontAwesomeIcon icon={faEnvelope} className="w-3.5 shrink-0 text-[#ffd100]" />
-                  <span className="break-all font-semibold">{content.site.email}</span>
+                  <span className="break-all font-semibold">{CONTACT_EMAIL}</span>
                 </a>
               </li>
               <li className="flex items-center gap-3 text-white/60">
                 <FontAwesomeIcon icon={faClock} className="w-3.5 shrink-0 text-[#ffd100]" />
-                <span>{content.site.horaires}</span>
+                <span>{CONTACT_HOURS}</span>
               </li>
             </ul>
 

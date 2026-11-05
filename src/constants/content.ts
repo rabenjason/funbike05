@@ -12,13 +12,7 @@ export const content = {
     logoAlt: "Funbike Madagascar",
     pays: "Madagascar",
     ville: "Antananarivo",
-    adresse: "Ambodivona, Antananarivo",
-    adresseComplete: "Showroom & atelier Funbike\nAntananarivo, Madagascar",
-    telephoneAffiche: "+261 34 00 000 00",
-    telephoneLien: "tel:+261340000000",
-    email: "contact@funbike.mg",
-    horaires: "Lun – sam · 8h00 - 17h30",
-    horairesCourts: "Lun – Sam · 8h00 – 17h30",
+    // Adresse, téléphone, e-mail et horaires : source unique dans src/data/contact.ts.
   },
 
   navigation: {
@@ -284,12 +278,7 @@ export const content = {
     whatsappNonRenseigne: "WhatsApp : non renseigné",
     demandePiecePrefix: "Bonjour, je souhaiterais connaître le prix, la disponibilité et la compatibilité de : ",
     demandePieceSuffix: ".",
-    infos: [
-      { label: "Showroom & atelier", value: "Antananarivo, Madagascar" },
-      { label: "Horaires", value: "Lun - sam · 8h00 - 17h30" },
-      { label: "Téléphone", value: "+261 34 00 000 00" },
-      { label: "Email", value: "contact@funbike.mg" },
-    ],
+    // Les lignes d'informations de contact sont centralisées dans src/data/contact.ts (CONTACT_INFO).
   },
 
   blog: {
@@ -312,7 +301,7 @@ export const content = {
     catalogue: "Catalogue",
     nousTrouver: "Nous trouver",
     showroom: "Showroom & atelier Funbike",
-    adresse: "Ambodivona, Antananarivo",
+    // Adresse affichée : source unique dans src/data/contact.ts (CONTACT_ADDRESS).
     revendeurs: "Tous nos revendeurs",
     droitsReserves: "Funbike Madagascar · Tous droits réservés",
     cookies: "Cookies",
