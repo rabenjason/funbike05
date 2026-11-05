@@ -3,14 +3,10 @@ import { AnimatePresence, motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faClock, faEnvelope, faLocationDot, faPhone } from "@fortawesome/free-solid-svg-icons";
 import { findProductById } from "../data";
+import { CONTACT_EMAIL, CONTACT_INFO } from "../data/contact";
 
-const CONTACT_EMAIL = "contact@funbike.mg";
-const CONTACT_INFO = [
-  { icon: faLocationDot, label: "Showroom & atelier", value: "Antananarivo, Madagascar" },
-  { icon: faClock, label: "Horaires", value: "Lun - sam · 8h00 - 17h30" },
-  { icon: faPhone, label: "Téléphone", value: "+261 34 00 000 00", href: "tel:+261340000000" },
-  { icon: faEnvelope, label: "Email", value: CONTACT_EMAIL, href: `mailto:${CONTACT_EMAIL}` },
-];
+// Les coordonnées affichées sont centralisées dans src/data/contact.ts.
+const CONTACT_ICONS = { address: faLocationDot, hours: faClock, phone: faPhone, email: faEnvelope } as const;
 
 export default function Contact({ inquiryId }: { inquiryId?: string }) {
   const [sent, setSent] = useState(false);
@@ -37,7 +33,7 @@ export default function Contact({ inquiryId }: { inquiryId?: string }) {
           <div className="mt-8 border-t border-black/15 dark:border-white/15">
             {CONTACT_INFO.map((item) => (
               <div key={item.label} className="grid grid-cols-[1.5rem_1fr] gap-3 border-b border-black/15 py-4 dark:border-white/15">
-                <FontAwesomeIcon icon={item.icon} className="mt-1 text-xs text-[#98741b] dark:text-[#ffd100]" />
+                <FontAwesomeIcon icon={CONTACT_ICONS[item.id]} className="mt-1 text-xs text-[#98741b] dark:text-[#ffd100]" />
                 <div>
                   <p className="text-[9px] font-bold uppercase tracking-[0.15em] text-black/45 dark:text-white/45">{item.label}</p>
                   {item.href ? (

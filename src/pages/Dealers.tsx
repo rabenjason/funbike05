@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faArrowLeft,
   faArrowRight,
   faArrowUpRightFromSquare,
   faClock,
@@ -14,16 +15,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import type { Dealer } from "../types";
+import { DEALERS } from "../data/dealers";
 
 export type { Dealer };
-
-// Verify contact details and exact street coordinates before publishing.
-export const DEALERS: Dealer[] = [
-  { key: "antananarivo", city: "Antananarivo", name: "Funbike Showroom", kind: "Showroom principal", address: "Ambodivona, Antananarivo", hours: "Lun – Sam · 8h30 – 17h30", phone: "+261 34 00 000 00", email: "contact@funbike.mg", desc: "Le point de départ de votre prochaine aventure. Retrouvez les motos, les équipements et notre atelier à la même adresse.", lat: -18.8792, lon: 47.5079, services: ["Motos", "Essais", "Atelier", "Pièces"] },
-  { key: "toamasina", city: "Toamasina", name: "Funbike Est", kind: "Point de vente", address: "Boulevard Joffre, Toamasina", hours: "Lun – Ven · 9h – 17h", phone: "+261 34 11 111 11", email: "est@funbike.mg", desc: "Sur la côte est, une équipe à vos côtés pour choisir votre moto, vous équiper et assurer l'entretien courant.", lat: -18.1492, lon: 49.4023, services: ["Motos", "Équipements", "Entretien"] },
-  { key: "mahajanga", city: "Mahajanga", name: "Funbike Nord-Ouest", kind: "Point de vente", address: "Avenue de France, Mahajanga", hours: "Lun – Ven · 9h – 17h", phone: "+261 34 22 222 22", email: "ouest@funbike.mg", desc: "Votre relais Funbike dans le nord-ouest pour les motos, les essais et les commandes de pièces.", lat: -15.7167, lon: 46.3167, services: ["Motos", "Essais", "Pièces"] },
-  { key: "fianarantsoa", city: "Fianarantsoa", name: "Atelier Partenaire", kind: "Atelier partenaire", address: "Route nationale 7, Fianarantsoa", hours: "Lun – Sam · 8h – 16h", phone: "+261 34 33 333 33", email: "sud@funbike.mg", desc: "Sur la RN7, un atelier partenaire pour l'entretien, les réparations et le montage de pièces.", lat: -21.4527, lon: 47.0857, services: ["Atelier", "Pièces", "Entretien"] },
-];
+export { DEALERS };
 
 const ZOOMS = [0.22, 0.12, 0.065, 0.035];
 const osmEmbed = (lat: number, lon: number, d: number) =>
@@ -41,6 +36,9 @@ export default function Dealers({ go, initialCity }: { go: (p: string, id?: stri
   const [mapReady, setMapReady] = useState(false);
   const [mapEnabled, setMapEnabled] = useState(false);
   const locatorRef = useRef<HTMLDivElement>(null);
+  const dealerTrackRef = useRef<HTMLUListElement>(null);
+  const [sliderAtStart, setSliderAtStart] = useState(true);
+  const [sliderAtEnd, setSliderAtEnd] = useState(false);
   const dealer = DEALERS.find((d) => d.key === activeKey)!;
 
   useEffect(() => {
@@ -62,6 +60,28 @@ export default function Dealers({ go, initialCity }: { go: (p: string, id?: stri
     setZoom((z) => Math.max(0, Math.min(ZOOMS.length - 1, z + delta)));
     setMapReady(false);
   }
+
+  /* Slider des fiches revendeurs : les flèches parcourent la liste générée
+     depuis src/data/dealers.ts, quel que soit le nombre de revendeurs. */
+  function updateSliderEdges() {
+    const el = dealerTrackRef.current;
+    if (!el) return;
+    setSliderAtStart(el.scrollLeft <= 4);
+    setSliderAtEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - 4);
+  }
+
+  function scrollDealers(direction: 1 | -1) {
+    const el = dealerTrackRef.current;
+    if (!el) return;
+    el.scrollBy({ left: direction * Math.max(el.clientWidth * 0.8, 240), behavior: "smooth" });
+  }
+
+  useEffect(() => {
+    updateSliderEdges();
+    window.addEventListener("resize", updateSliderEdges);
+    return () => window.removeEventListener("resize", updateSliderEdges);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="overflow-x-hidden bg-white text-[#171816] dark:bg-[#141513] dark:text-[#f2f0ea]">
@@ -256,35 +276,67 @@ export default function Dealers({ go, initialCity }: { go: (p: string, id?: stri
             <h2 id="network-heading" className="font-display text-[clamp(1.4rem,1.15rem+1.5vw,2.7rem)] font-semibold tracking-[-0.05em]">
               D'une ville à l'autre.
             </h2>
-            <p className="text-[13px] text-black/50 sm:text-sm dark:text-white/50">Touchez une adresse pour la situer sur la carte.</p>
+            {/* Flèches du slider de fiches (voir plus bas) */}
+            <div className="flex items-center justify-between gap-3 sm:justify-end">
+              <p className="text-[13px] text-black/50 sm:text-sm dark:text-white/50">Touchez une adresse pour la situer sur la carte.</p>
+              <div className="flex shrink-0 items-center border border-black/10 bg-white shadow-md dark:border-white/10 dark:bg-[#171816]">
+                <button
+                  type="button"
+                  onClick={() => scrollDealers(-1)}
+                  disabled={sliderAtStart}
+                  aria-label="Fiches des revendeurs précédentes"
+                  className="grid h-10 w-10 place-items-center text-sm disabled:opacity-30"
+                >
+                  <FontAwesomeIcon icon={faArrowLeft} />
+                </button>
+                <span className="h-5 w-px bg-black/10 dark:bg-white/10" />
+                <button
+                  type="button"
+                  onClick={() => scrollDealers(1)}
+                  disabled={sliderAtEnd}
+                  aria-label="Fiches des revendeurs suivantes"
+                  className="grid h-10 w-10 place-items-center text-sm disabled:opacity-30"
+                >
+                  <FontAwesomeIcon icon={faArrowRight} />
+                </button>
+              </div>
+            </div>
           </div>
 
-          <ul className="border-t border-black/10 dark:border-white/10">
+          {/* Slider de fiches : une fiche par revendeur, générée depuis
+              src/data/dealers.ts — s'adapte automatiquement au nombre de
+              revendeurs, sur ordinateur, tablette et mobile. */}
+          <ul
+            ref={dealerTrackRef}
+            onScroll={updateSliderEdges}
+            aria-label="Fiches des revendeurs"
+            className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [scrollbar-width:none]"
+          >
             {DEALERS.map((d) => {
               const selected = d.key === activeKey;
               return (
-                <li key={d.key}>
+                <li key={d.key} className="w-[min(16.5rem,78%)] shrink-0 snap-start sm:w-[19rem] lg:w-[20rem]">
                   <button
                     type="button"
                     onClick={() => select(d.key, true)}
                     aria-current={selected ? "true" : undefined}
-                    className="group relative grid min-h-[4.5rem] w-full grid-cols-[1fr_auto] items-center gap-3 border-b border-black/10 py-3.5 pl-4 pr-1 text-left transition hover:bg-black/[0.025] active:bg-black/[0.04] sm:grid-cols-[1.1fr_1fr_1fr_auto] sm:gap-4 sm:pl-5 dark:border-white/10 dark:hover:bg-white/[0.03] dark:active:bg-white/[0.05]"
+                    className="group relative flex min-h-[7.5rem] w-full flex-col items-start gap-1 border border-black/10 bg-white py-4 pl-4 pr-3 text-left transition hover:bg-black/[0.025] active:bg-black/[0.04] dark:border-white/10 dark:bg-[#1b1c19] dark:hover:bg-white/[0.03] dark:active:bg-white/[0.05]"
                   >
                     <span
                       aria-hidden="true"
                       className={"absolute inset-y-3 left-0 w-[3px] transition " + (selected ? "bg-[#ffd100]" : "bg-transparent")}
                     />
-                    <span className="min-w-0">
-                      <span className="block font-display text-[clamp(1.02rem,0.92rem+0.55vw,1.3rem)] font-semibold leading-tight">{d.city}</span>
-                      <span className="mt-0.5 block truncate text-[12px] text-black/50 sm:hidden dark:text-white/50">
-                        {d.name} · {d.address}
+                    <span className="flex w-full items-start justify-between gap-2">
+                      <span className="min-w-0 font-display text-[clamp(1.02rem,0.92rem+0.55vw,1.3rem)] font-semibold leading-tight">{d.city}</span>
+                      <span className="grid h-10 w-10 shrink-0 place-items-center text-xs text-black/40 transition group-hover:translate-x-1 group-hover:text-[#98741b] dark:text-white/40 dark:group-hover:text-[#ffd100]">
+                        <FontAwesomeIcon icon={faArrowRight} />
                       </span>
                     </span>
-                    <span className="hidden text-sm text-black/60 sm:block dark:text-white/60">{d.name}</span>
-                    <span className="hidden text-sm text-black/45 sm:block dark:text-white/45">{d.kind}</span>
-                    <span className="grid h-10 w-10 place-items-center text-xs text-black/40 transition group-hover:translate-x-1 group-hover:text-[#98741b] dark:text-white/40 dark:group-hover:text-[#ffd100]">
-                      <FontAwesomeIcon icon={faArrowRight} />
+                    <span className="mt-0.5 block w-full truncate text-[12px] text-black/50 sm:hidden dark:text-white/50">
+                      {d.name} · {d.address}
                     </span>
+                    <span className="hidden w-full truncate text-sm text-black/60 sm:block dark:text-white/60">{d.name}</span>
+                    <span className="hidden w-full truncate text-sm text-black/45 sm:block dark:text-white/45">{d.kind}</span>
                   </button>
                 </li>
               );

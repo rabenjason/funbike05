@@ -11,4 +11,6 @@ export interface Dealer {
   lat: number;
   lon: number;
   services: string[];
+  /** Fiche de démonstration (informations fictives) : ne pas présenter comme un revendeur officiel. */
+  isDemo?: boolean;
 }
