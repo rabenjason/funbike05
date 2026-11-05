@@ -1,7 +1,7 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpRightFromSquare, type IconDefinition } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
-import { BRANDS } from "../data";
+import { brands } from "../data";
 
 export type AccessoryBrandKey = "tld" | "gaerne" | "mt" | "tvs" | "bihr";
 
@@ -13,14 +13,14 @@ export type AccessoryBrand = {
   alt: string;
 };
 
-const logoOf = (name: string) => BRANDS.find((brand) => brand.name === name)?.src ?? "";
+const logoOf = (name: string) => brands.find((brand) => brand.name === name)?.logoUrl ?? "";
 
 /** Marques d'équipements pilote. */
 export const ACCESSORY_BRANDS: AccessoryBrand[] = [
   {
     key: "tld",
     name: "Troy Lee Designs",
-    logo: "https://funbike.mg/wp-content/uploads/2026/02/sticker-troy-lee-designs-shield-logo-rouge-16cm.png",
+    logo: logoOf("Troy Lee Designs"),
     alt: "Logo Troy Lee Designs",
   },
   { key: "gaerne", name: "Gaerne", logo: logoOf("Gaerne"), alt: "Logo Gaerne" },

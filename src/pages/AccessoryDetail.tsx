@@ -8,7 +8,8 @@ import {
   faMagnifyingGlassPlus,
   faPhone,
 } from "@fortawesome/free-solid-svg-icons";
-import { ALL_PARTS, findPart, partBrandLabel, partFamily, type Part } from "../data";
+import { products, findProductById, brands, categories, productTypes, productGallery } from "../data";
+import type { Product, ProductSpecification } from "../types/product";
 import { Section, type Route } from "../components/Layout";
 import { PartCard } from "../components/Cards";
 import SmartImage from "../components/SmartImage";
@@ -22,50 +23,44 @@ type Props = {
   backLabel: string;
 };
 
-function autoDesc(part: Part): string {
-  if (part.desc) return part.desc;
-  const brand = partBrandLabel(part);
-  if (part.kind === "piece") {
-    const compat = part.compatibleBrand && part.compatibleBrand !== "Universal" ? ` compatible ${part.compatibleBrand}` : "";
-    const type = part.partType ? ` — ${part.partType.toLowerCase()}` : "";
-    return `Pièce détachée${compat}${type} proposée par Funbike. Compatibilité exacte et disponibilité à confirmer avec le modèle et l'année de votre moto.`;
-  }
-  const cat = part.category ? ` — ${part.category.toLowerCase()}` : "";
-  return `Équipement pilote ${brand}${cat} proposé par Funbike. Taille, coloris et disponibilité à confirmer avec l'équipe.`;
+function brandName(product: Product): string {
+  return brands.find((brand) => brand.id === product.brandId)?.name ?? "Marque non renseignée";
 }
 
-function autoSpecs(part: Part): { label: string; value: string }[] {
-  if (part.specs && part.specs.length) return part.specs.slice(0, 5);
-  const specs: { label: string; value: string }[] = [{ label: "Marque", value: partBrandLabel(part) }];
-  if (part.kind === "piece") {
-    if (part.partType) specs.push({ label: "Type", value: part.partType });
-    specs.push({
-      label: "Compatibilité",
-      value: part.compatibleBrand && part.compatibleBrand !== "Universal" ? part.compatibleBrand : "Toutes motos",
-    });
-  } else {
-    if (part.category) specs.push({ label: "Catégorie", value: part.category });
-    specs.push({ label: "Usage", value: "Pilote" });
+function autoDesc(product: Product): string {
+  if (product.description) return product.description;
+  const brand = brandName(product);
+  if (product.categoryId === "pieces-detachees") {
+    return `Pièce détachée ${brand}. Compatibilité et disponibilité à confirmer avec le modèle et l'année de votre moto.`;
   }
-  specs.push({ label: "Référence", value: part.id });
+  return `Équipement pilote ${brand}. Détails, tailles et disponibilité à confirmer avec l'équipe Funbike.`;
+}
+
+function autoSpecs(product: Product): ProductSpecification[] {
+  if (product.specifications.length) return product.specifications.slice(0, 5);
+  const specs: ProductSpecification[] = [{ key: "Marque", value: brandName(product) }];
+  const type = productTypes.find((item) => item.id === product.productTypeId)?.name;
+  if (type) specs.push({ key: "Type", value: type });
+  const compatible = (product.compatibleBrandIds ?? []).map((id) => brands.find((brand) => brand.id === id)?.name).filter(Boolean);
+  if (compatible.length) specs.push({ key: "Compatibilité", value: compatible.join(", ") });
+  const category = categories.find((item) => item.id === product.categoryId)?.name;
+  if (category) specs.push({ key: "Catégorie", value: category });
+  specs.push({ key: "Référence", value: product.id });
   return specs.slice(0, 5);
 }
 
 export default function AccessoryDetail({ id, go, back, backLabel }: Props) {
-  const part = findPart(id) ?? ALL_PARTS[0];
-  const gallery = part.gallery && part.gallery.length ? part.gallery : [part.image];
+  const part = findProductById(id) ?? products.find((product) => product.categoryId !== "motos") ?? products[0];
+  const gallery = productGallery(part);
+  const brand = brandName(part);
+  const category = categories.find((item) => item.id === part.categoryId)?.name ?? "Produit";
   const [active, setActive] = useState(0);
   const [viewerOpen, setViewerOpen] = useState(false);
   const specs = autoSpecs(part);
   const desc = autoDesc(part);
-  const eyebrow = `${partBrandLabel(part)} / ${partFamily(part)}`.toUpperCase();
+  const eyebrow = `${brand} / ${category}`.toUpperCase();
 
-  const related = ALL_PARTS.filter((p) => {
-    if (p.id === part.id) return false;
-    if (p.kind === part.kind) return true;
-    if (part.kind === "piece" && p.kind === "piece" && p.compatibleBrand === part.compatibleBrand) return true;
-    return false;
-  }).slice(0, 4);
+  const related = products.filter((product) => product.id !== part.id && product.categoryId === part.categoryId).slice(0, 4);
 
   return (
     <div className="overflow-x-hidden bg-white dark:bg-[#141513]">
@@ -90,13 +85,13 @@ export default function AccessoryDetail({ id, go, back, backLabel }: Props) {
           >
             <SmartImage
               src={gallery[active]}
-              alt={part.name}
+              alt={part.images.find((image) => image.isMain)?.altText ?? part.name}
               eager
               className="h-full w-full"
               imgClassName="object-contain p-3 transition-transform duration-500 group-hover:scale-[1.025] sm:p-5"
             />
             <span className="absolute bottom-3 left-3 max-w-[calc(100%-1.5rem)] truncate border border-white/60 bg-white/90 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.12em] text-[#171816] shadow-sm backdrop-blur-xl sm:bottom-5 sm:left-5 sm:tracking-[0.14em]">
-              {partBrandLabel(part)} / {partFamily(part)}
+              {brand} / {category}
             </span>
             <span className="absolute right-3 top-3 inline-flex min-h-9 items-center gap-2 rounded-full border border-black/10 bg-white/85 px-3 text-[10px] font-bold uppercase tracking-[0.1em] text-[#171816] shadow-sm backdrop-blur transition group-hover:bg-white dark:border-white/10 dark:bg-black/55 dark:text-white dark:group-hover:bg-black/75">
               <FontAwesomeIcon icon={faMagnifyingGlassPlus} />
@@ -145,12 +140,12 @@ export default function AccessoryDetail({ id, go, back, backLabel }: Props) {
           <dl className="mt-6 min-w-0 border-t border-black/15 dark:border-white/15 sm:mt-7">
             {specs.map((spec, index) => (
               <div
-                key={spec.label}
+                key={spec.key}
                 className="grid min-w-0 grid-cols-[1.75rem_minmax(0,0.85fr)_minmax(0,1.15fr)] items-center gap-1.5 border-b border-black/15 py-3 dark:border-white/15 sm:grid-cols-[2.2rem_1fr_1.2fr] sm:gap-2"
               >
                 <span className="font-display text-[10px] text-black/35 dark:text-white/35">0{index + 1}</span>
                 <dt className="min-w-0 break-words text-[9px] font-bold uppercase leading-4 tracking-[0.07em] text-black/50 dark:text-white/50 sm:text-[10px] sm:tracking-[0.1em]">
-                  {spec.label}
+                  {spec.key}
                 </dt>
                 <dd className="min-w-0 break-words text-right text-[11px] font-semibold leading-4 text-[#171816] dark:text-[#f2f0ea] sm:text-xs">
                   {spec.value}
@@ -166,7 +161,7 @@ export default function AccessoryDetail({ id, go, back, backLabel }: Props) {
                   Prix & disponibilité
                 </p>
                 <p className="mt-1 font-display text-[clamp(1.25rem,1.1rem+0.6vw,1.65rem)] font-semibold leading-none text-[#171816] dark:text-[#f2f0ea]">
-                  {part.price}
+                  {part.price ?? "Sur devis"}
                 </p>
               </div>
 
@@ -215,7 +210,7 @@ export default function AccessoryDetail({ id, go, back, backLabel }: Props) {
         open={viewerOpen}
         images={gallery}
         active={active}
-        alt={part.name}
+        alt={part.images.find((image) => image.isMain)?.altText ?? part.name}
         onActiveChange={setActive}
         onClose={() => setViewerOpen(false)}
       />

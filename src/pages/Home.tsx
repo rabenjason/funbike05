@@ -1,4 +1,4 @@
-import { homepageContent } from "../data/homepage";
+import { homepage, homepageContent, homepageCategories } from "../data/homepage";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -10,8 +10,8 @@ import {
   faMotorcycle,
   faShirt,
 } from "@fortawesome/free-solid-svg-icons";
-import { BIKES, BRANDS, TVS_ACCESSORIES, TVS_PARTS } from "../data";
-import { homepageCategories } from "../data/homepage";
+import { motorcycles, brands, spareParts, helmets, ridingGear, mainProductImage } from "../data";
+import type { Product } from "../types/product";
 import { Section } from "../components/Layout";
 import { BikeCard, PartCard } from "../components/Cards";
 import { AccessoryBrandQuickLinks } from "../components/AccessoryBrands";
@@ -20,42 +20,19 @@ import BrandExclusif from "../components/BrandExclusif";
 import NewArrivals from "../components/NewArrivals";
 import TypedText from "../components/TypedText";
 
-const FEATURED = [
-  {
-    id: "sherco-sef-250-factory-2026",
-    short: "SEF 250 Factory",
-    brand: "Sherco",
-    tag: "Enduro / Factory",
-    image: "https://funbike.mg/wp-content/uploads/2026/02/01-250-SEF-FACTORY-2026-3679x2456-1-1920x1080-1.jpg",
-    alt: "Sherco SEF 250 Factory 2026 en action",
-  },
-  {
-    id: "sherco-sef-300-factory-2026",
-    short: "SEF 300 Factory",
-    brand: "Sherco",
-    tag: "Enduro / Factory",
-    image: "https://funbike.mg/wp-content/uploads/2026/02/01-300-SEF-FACTORY-2026-3679x2456-1-1920x1080-1.jpg",
-    alt: "Sherco SEF 300 Factory 2026 en action",
-  },
-  {
-    id: "xx-125-2026",
-    short: "XX 125 Off-Road",
-    brand: "Fantic",
-    tag: "Cross / 125 cc",
-    image: "https://funbike.mg/wp-content/uploads/2026/02/7b566adac57a4b5dbfd74d4f768e6fdb.jpg",
-    alt: "Fantic XX 125 2026 sur piste",
-  },
-];
+const HERO_PRODUCTS = homepage.heroFeaturedProductIds.map((id) => motorcycles.find((product) => product.id === id)).filter((product): product is Product => Boolean(product));
+const brandName = (product: Product) => brands.find((brand) => brand.id === product.brandId)?.name ?? "Marque non renseignée";
+const shortName = (product: Product) => homepage.heroProductLabels[product.id as keyof typeof homepage.heroProductLabels] ?? product.name;
 
 const CATEGORY_ICONS = [faMotorcycle, faHelmetSafety, faGears, faShirt];
 
 export default function Home({ go }: { go: (p: string, id?: string) => void }) {
   const [activeHero, setActiveHero] = useState(0);
-  const current = FEATURED[activeHero];
+  const current = HERO_PRODUCTS[activeHero];
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setActiveHero((index) => (index + 1) % FEATURED.length);
+      setActiveHero((index) => (index + 1) % HERO_PRODUCTS.length);
     }, 6500);
     return () => window.clearInterval(timer);
   }, []);
@@ -67,8 +44,8 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
         <AnimatePresence initial={false} mode="sync">
           <motion.img
             key={current.id}
-            src={current.image}
-            alt={current.alt}
+            src={mainProductImage(current)?.url ?? ""}
+            alt={mainProductImage(current)?.altText ?? current.name}
             initial={{ opacity: 0, scale: 1.035 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
@@ -123,7 +100,7 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
               onClick={() => go("product", current.id)}
               className="hero-secondary-cta glass-panel fluid-btn inline-flex min-h-12 w-full items-center justify-center gap-3 border-white/40 bg-white/10 px-5 py-3 text-center font-bold uppercase text-white transition active:scale-[0.98] hover:border-[#ffd100] hover:text-[#ffd100] sm:min-h-11 sm:w-auto"
             >
-              <span className="truncate">{current.short}</span>
+              <span className="truncate">{shortName(current)}</span>
               <FontAwesomeIcon icon={faArrowRight} className="shrink-0" />
             </button>
           </motion.div>
@@ -138,9 +115,9 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
                   exit={{ opacity: 0, y: -8 }}
                   transition={{ duration: 0.25 }}
                 >
-                  <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#ffd100]">{homepageContent.hero.aLaUne} / {current.brand}</p>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-[#ffd100]">{homepageContent.hero.aLaUne} / {brandName(current)}</p>
                   <p className="mt-0.5 truncate font-display text-sm font-semibold sm:mt-1 sm:text-base">
-                    {current.short} · {homepageContent.hero.annee}
+                    {shortName(current)} · {homepageContent.hero.annee}
                   </p>
                 </motion.div>
               </AnimatePresence>
@@ -150,11 +127,11 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
                 0{activeHero + 1}
               </span>
               <div className="flex items-center" aria-label={homepageContent.hero.choisirModele}>
-                {FEATURED.map((item, index) => (
+                {HERO_PRODUCTS.map((item, index) => (
                   <button
                     key={item.id}
                     onClick={() => setActiveHero(index)}
-                    aria-label={`${homepageContent.hero.afficherModele} ${item.short}`}
+                    aria-label={`${homepageContent.hero.afficherModele} ${shortName(item)}`}
                     aria-pressed={activeHero === index}
                     className="group grid h-11 w-8 place-items-center px-1.5 sm:h-9"
                   >
@@ -183,7 +160,7 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
             {homepageCategories.map((category, index) => (
               <motion.button
                 key={category.title}
-                onClick={() => go(category.to, category.brand)}
+                onClick={() => go(category.to, "brand" in category ? category.brand : undefined)}
                 whileHover={{ x: 4 }}
                 className="group flex min-h-14 items-center gap-3 border-b border-black/10 px-2 py-3 text-left transition hover:bg-white/65 hover:backdrop-blur-xl dark:border-white/15 dark:hover:bg-white/[0.035]"
               >
@@ -209,10 +186,7 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
         number={homepageContent.motos.numero}
       >
         <div className="grid gap-x-5 gap-y-8 sm:grid-cols-2 sm:gap-x-6 lg:grid-cols-3 lg:gap-x-8">
-          {FEATURED.map((featured) => {
-            const model = BIKES.find((item) => item.id === featured.id);
-            return model ? <BikeCard key={model.id} bike={model} go={go} /> : null;
-          })}
+          {HERO_PRODUCTS.map((product) => <BikeCard key={product.id} bike={product} go={go} />)}
         </div>
         <button
           onClick={() => go("motos")}
@@ -240,7 +214,7 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
             <AccessoryBrandQuickLinks onSelect={(brand) => go("equipements", brand)} />
           </div>
           <div className="grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-3 sm:gap-x-4 lg:grid-cols-4 lg:gap-x-5">
-            {[TVS_PARTS[0], TVS_PARTS[2], TVS_ACCESSORIES[0], TVS_ACCESSORIES[2]].map((part) => (
+            {[...spareParts.filter((product) => product.compatibleBrandIds?.includes("tvs")).slice(0, 2), [...helmets, ...ridingGear].filter((product) => product.brandId === "tvs")[0], [...helmets, ...ridingGear].filter((product) => product.brandId === "tvs")[2]].map((part) => (
               <PartCard
                 key={part.id}
                 part={part}
@@ -276,7 +250,7 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
             />
 
             <div className="fb-partner-track flex w-max items-center gap-6 pr-6 sm:gap-10 sm:pr-10">
-              {[...BRANDS, ...BRANDS].map((brand, index) => (
+              {[...brands.filter((brand) => brand.logoUrl), ...brands.filter((brand) => brand.logoUrl)].map((brand, index) => (
                 <motion.div
                   key={`${brand.name}-${index}`}
                   whileHover={{ scale: 1.08 }}
@@ -284,7 +258,7 @@ export default function Home({ go }: { go: (p: string, id?: string) => void }) {
                   className="brand-logo-tile shrink-0"
                 >
                   <img
-                    src={brand.src}
+                    src={brand.logoUrl ?? ""}
                     alt={`${homepageContent.partenaires.logoPrefix} ${brand.name}`}
                     loading="lazy"
                     className="partner-logo h-full w-full object-contain transition-opacity hover:opacity-100"

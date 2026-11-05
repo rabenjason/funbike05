@@ -2,7 +2,7 @@ import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faClock, faEnvelope, faLocationDot, faPhone } from "@fortawesome/free-solid-svg-icons";
-import { PARTS, TVS_PARTS, SHERCO_PARTS, FANTIC_PARTS, TVS_ACCESSORIES } from "../data";
+import { findProductById } from "../data";
 
 const CONTACT_EMAIL = "contact@funbike.mg";
 const CONTACT_INFO = [
@@ -14,10 +14,12 @@ const CONTACT_INFO = [
 
 export default function Contact({ inquiryId }: { inquiryId?: string }) {
   const [sent, setSent] = useState(false);
-  const accessory = [...TVS_ACCESSORIES, ...PARTS, ...TVS_PARTS, ...SHERCO_PARTS, ...FANTIC_PARTS].find(
-    (item) => item.id === inquiryId,
-  );
-  const inquirySubject = accessory?.kind === "tvs" ? "tvs-accessoires" : accessory ? "pieces" : "";
+  const accessory = findProductById(inquiryId);
+  const inquirySubject = accessory?.brandId === "tvs"
+    ? "tvs-accessoires"
+    : accessory?.categoryId === "pieces-detachees"
+      ? "pieces"
+      : "";
 
   return (
     <div className="bg-white dark:bg-[#141513]">

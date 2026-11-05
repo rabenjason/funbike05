@@ -1,34 +1,12 @@
-import { homepageContent } from "../data/homepage";
+import { homepageContent, homepageExclusiveBrands } from "../data/homepage";
+import { brands } from "../data";
 import { motion, type Variants } from "framer-motion";
 import SmartImage from "./SmartImage";
 
-export type ExclusiveBrand = {
-  key: string;
-  name: string;
-  tagline: string;
-  image: string;
-};
-
-export const EXCLUSIVE_BRANDS: ExclusiveBrand[] = [
-  {
-    key: "tvs",
-    name: "TVS",
-    tagline: "Robustesse garantie",
-    image: "https://funbike.mg/wp-content/uploads/2026/02/tvs-logo.png",
-  },
-  {
-    key: "fantic",
-    name: "Fantic",
-    tagline: "Performance italienne",
-    image: "https://funbike.mg/wp-content/themes/funbike/images/fantic.png",
-  },
-  {
-    key: "sherco",
-    name: "Sherco",
-    tagline: "ADN Compétition",
-    image: "https://funbike.mg/wp-content/uploads/2026/02/sherco.png",
-  },
-];
+const EXCLUSIVE_BRANDS = homepageExclusiveBrands.flatMap(({ brandId, tagline }) => {
+  const brand = brands.find((item) => item.id === brandId);
+  return brand?.logoUrl ? [{ key: brand.id, name: brand.name, tagline, image: brand.logoUrl }] : [];
+});
 
 const list: Variants = {
   hidden: {},

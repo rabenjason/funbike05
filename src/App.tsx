@@ -10,7 +10,7 @@ import Product from "./pages/Product";
 import AccessoryDetail from "./pages/AccessoryDetail";
 import Contact from "./pages/Contact";
 import Dealers from "./pages/Dealers";
-import { BIKES, findPart } from "./data";
+import { motorcycles, findProductById } from "./data";
 import { persistTheme, readDarkPreference } from "./lib/theme";
 
 const FIRST_HERO =
@@ -33,11 +33,11 @@ function routeLabel(route: Route): string {
     case "spares":
       return "Pièces détachées";
     case "product": {
-      const bike = BIKES.find((b) => b.id === route.id);
+      const bike = motorcycles.find((product) => product.id === route.id);
       return bike ? bike.name : "Fiche moto";
     }
     case "accessory": {
-      const part = findPart(route.id);
+      const part = findProductById(route.id);
       return part ? part.name : "Fiche produit";
     }
     case "revendeurs":

@@ -19,7 +19,8 @@ import {
   faXmark,
   type IconDefinition,
 } from "@fortawesome/free-solid-svg-icons";
-import { BIKES, type Bike } from "../data";
+import { motorcycles, brands, mainProductImage } from "../data";
+import type { Product } from "../types/product";
 import SmartImage from "./SmartImage";
 import {
   EMPTY_MEMORY,
@@ -154,7 +155,7 @@ function loadStored(): Stored | null {
 }
 
 const clock = (time: number) => new Intl.DateTimeFormat("fr-FR", { hour: "2-digit", minute: "2-digit" }).format(time);
-const bikeById = (id: string) => BIKES.find((b) => b.id === id);
+const bikeById = (id: string) => motorcycles.find((bike) => bike.id === id);
 
 const ACTION_ICONS: Record<ChatActionIcon, IconDefinition> = {
   catalog: faLayerGroup,
@@ -206,9 +207,9 @@ function ProductStrip({
 }: {
   ids: string[];
   reasons?: Record<string, string>;
-  onOpen: (bike: Bike) => void;
+  onOpen: (bike: Product) => void;
 }) {
-  const bikes = ids.map(bikeById).filter((b): b is Bike => Boolean(b));
+  const bikes = ids.map(bikeById).filter((b): b is Product => Boolean(b));
   const trackRef = useRef<HTMLDivElement>(null);
   const [index, setIndex] = useState(0);
 
@@ -266,14 +267,14 @@ function ProductStrip({
               }
             >
               <SmartImage
-                src={bike.image}
-                alt={bike.alt}
+                src={mainProductImage(bike)?.url ?? ""}
+                alt={mainProductImage(bike)?.altText ?? bike.name}
                 className="fb-card-media aspect-[4/3]"
                 imgClassName="object-contain p-2 transition-transform duration-500 group-hover:scale-105"
               />
               <div className="p-2.5">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-black/45 dark:text-white/45">
-                  {bike.brand} · {bike.family}
+                  {brands.find((item) => item.id === bike.brandId)?.name ?? "Marque non renseignée"} · {bike.family}
                 </p>
                 <p className="mt-0.5 line-clamp-2 text-[13px] font-semibold leading-snug text-[#171816] dark:text-[#f2f0ea]">
                   {bike.name}
@@ -344,9 +345,9 @@ function CompareTable({ ids }: { ids: [string, string] }) {
   const a = bikeById(ids[0]);
   const b = bikeById(ids[1]);
   if (!a || !b) return null;
-  const labels = Array.from(new Set([...a.specs, ...b.specs].map((s) => s.label)));
-  const value = (bike: Bike, label: string) => bike.specs.find((s) => s.label === label)?.value ?? "—";
-  const short = (bike: Bike) => bike.name.replace(/ 2026$/, "");
+  const labels = Array.from(new Set([...a.specifications, ...b.specifications].map((spec) => spec.key)));
+  const value = (bike: Product, label: string) => bike.specifications.find((spec) => spec.key === label)?.value ?? "—";
+  const short = (bike: Product) => bike.name.replace(/ 2026$/, "");
   return (
     <div className="no-scrollbar mt-2 overflow-x-auto rounded-xl border border-black/10 text-[12px] dark:border-white/10">
       <div className="min-w-[24rem]">

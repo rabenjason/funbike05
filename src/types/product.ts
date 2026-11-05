@@ -13,7 +13,19 @@ export interface ProductSpecification {
   value: string;
 }
 
-/** Unified static product shape; suitable for mapping to a future GraphQL DTO. */
+export interface Brand {
+  id: string;
+  name: string;
+  logoUrl?: string;
+}
+
+export interface Model {
+  id: string;
+  name: string;
+  brandId: string;
+}
+
+/** Unified static catalog record, also suitable for a future API adapter. */
 export interface Product {
   id: string;
   name: string;
@@ -29,9 +41,10 @@ export interface Product {
   price?: string;
   tags?: string[];
   badge?: string;
+  /** Existing vehicle family classification. */
   family?: string;
-  compatibleBrandId?: string;
+  /** Compatibility is separate from the product's manufacturer. */
+  compatibleBrandIds?: string[];
+  compatibilityNote?: string;
   sourceUrl?: string;
-  /** Preserves existing accessory classification used by current UI. */
-  legacyKind?: string;
 }

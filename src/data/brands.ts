@@ -1,12 +1,59 @@
-import { BRANDS as legacyBrands, BIKES, ALL_PARTS, partBrandLabel } from "./catalogSource";
+import type { Brand } from "../types/product";
 
-const slug = (value: string) => value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-const names = new Set([...legacyBrands.map((b) => b.name), ...BIKES.map((b) => b.brand), ...ALL_PARTS.map(partBrandLabel)]);
-export const brands = [...names].map((name) => ({
-  id: slug(name),
-  name,
-  ...(legacyBrands.find((brand) => brand.name.toLowerCase() === name.toLowerCase())?.src
-    ? { logoUrl: legacyBrands.find((brand) => brand.name.toLowerCase() === name.toLowerCase())!.src }
-    : {}),
-}));
-export const brandIdFor = (name: string) => slug(name);
+export const LOGO = "https://funbike.mg/wp-content/themes/funbike/images/logo-funbike.png";
+
+export const brands: Brand[] = [
+  {
+    "id": "tvs",
+    "name": "TVS",
+    "logoUrl": "https://funbike.mg/wp-content/uploads/2026/02/tvs-logo.png"
+  },
+  {
+    "id": "fantic",
+    "name": "Fantic",
+    "logoUrl": "https://funbike.mg/wp-content/themes/funbike/images/fantic.png"
+  },
+  {
+    "id": "sherco",
+    "name": "Sherco",
+    "logoUrl": "https://funbike.mg/wp-content/uploads/2026/02/sherco.png"
+  },
+  {
+    "id": "bihr",
+    "name": "Bihr",
+    "logoUrl": "https://funbike.mg/wp-content/uploads/2026/02/bihr-logo.jpg"
+  },
+  {
+    "id": "trace",
+    "name": "Trace",
+    "logoUrl": "https://funbike.mg/wp-content/uploads/2026/02/Trace-1.png"
+  },
+  {
+    "id": "gaerne",
+    "name": "Gaerne",
+    "logoUrl": "https://funbike.mg/wp-content/uploads/2026/02/gaerne-logo.jpg"
+  },
+  {
+    "id": "galfer",
+    "name": "Galfer",
+    "logoUrl": "https://funbike.mg/wp-content/uploads/2026/02/Galfer-logo.png"
+  },
+  {
+    "id": "mt-helmets",
+    "name": "MT Helmets",
+    "logoUrl": "https://funbike.mg/wp-content/uploads/2026/02/mt.png"
+  },
+  {
+    "id": "troy-lee-designs",
+    "name": "Troy Lee Designs",
+    "logoUrl": "https://funbike.mg/wp-content/uploads/2026/02/sticker-troy-lee-designs-shield-logo-rouge-16cm.png"
+  },
+  {
+    "id": "funbike",
+    "name": "Funbike"
+  },
+  {
+    "id": "unknown-brand",
+    "name": "Marque non renseignée"
+  }
+];

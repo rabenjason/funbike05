@@ -2,11 +2,14 @@ import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRight, faArrowUpRightFromSquare } from "@fortawesome/free-solid-svg-icons";
 import { motion } from "framer-motion";
-import type { Bike, Part } from "../data";
+import type { Product } from "../types/product";
+import { brands, mainProductImage, productGallery, productTypes } from "../data";
 import SmartImage from "./SmartImage";
 
-export function BikeCard({ bike, go }: { bike: Bike; go: (p: string, id?: string) => void }) {
-  const gallery = bike.gallery ?? [bike.image];
+const brandName = (product: Product) => brands.find((brand) => brand.id === product.brandId)?.name ?? "Marque non renseignée";
+
+export function BikeCard({ bike, go }: { bike: Product; go: (p: string, id?: string) => void }) {
+  const gallery = productGallery(bike);
   const [active, setActive] = useState(0);
 
   return (
@@ -18,7 +21,6 @@ export function BikeCard({ bike, go }: { bike: Bike; go: (p: string, id?: string
       transition={{ duration: 0.35, ease: "easeOut" }}
       className="fb-card group flex min-w-0 flex-col overflow-hidden text-left"
     >
-      {/* MEDIA — studio stage, full bike always visible */}
       <div className="fb-stage-white relative aspect-[4/3] overflow-hidden">
         <button
           type="button"
@@ -27,8 +29,8 @@ export function BikeCard({ bike, go }: { bike: Bike; go: (p: string, id?: string
           className="absolute inset-0 block"
         >
           <SmartImage
-            src={gallery[active]}
-            alt={bike.alt}
+            src={gallery[active] ?? mainProductImage(bike)?.url ?? ""}
+            alt={mainProductImage(bike)?.altText ?? bike.name}
             className="absolute inset-0"
             imgClassName="object-contain p-4 transition-transform duration-500 group-hover:scale-[1.04] sm:p-5"
           />
@@ -36,9 +38,9 @@ export function BikeCard({ bike, go }: { bike: Bike; go: (p: string, id?: string
 
         {gallery.length > 1 && (
           <div className="absolute inset-x-0 bottom-3 z-10 flex items-center justify-center gap-1.5">
-            {gallery.map((image, index) => (
+            {gallery.map((_, index) => (
               <button
-                key={image}
+                key={`${bike.id}-image-${index}`}
                 type="button"
                 onClick={() => setActive(index)}
                 aria-label={`Voir la photo ${index + 1}`}
@@ -59,17 +61,14 @@ export function BikeCard({ bike, go }: { bike: Bike; go: (p: string, id?: string
         )}
       </div>
 
-      {/* INFO */}
       <div className="flex flex-1 flex-col border-t border-black/[0.07] p-4 sm:p-5 dark:border-white/[0.07]">
         <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-black/45 dark:text-white/45">
-          {bike.brand} · {bike.family}
+          {brandName(bike)}{bike.family ? ` · ${bike.family}` : ""}
         </p>
-
         <h3 className="mt-2 font-display text-[clamp(1.25rem,1.05rem+0.7vw,1.6rem)] font-bold uppercase leading-[1.05] tracking-[-0.02em] text-[#171816] dark:text-white">
           {bike.name}
         </h3>
-
-        <p className="fluid-body mt-2.5 line-clamp-2 text-black/55 dark:text-white/55">{bike.desc}</p>
+        <p className="fluid-body mt-2.5 line-clamp-2 text-black/55 dark:text-white/55">{bike.description}</p>
 
         <div className="mt-5 flex items-center justify-between gap-3">
           <motion.button
@@ -81,9 +80,8 @@ export function BikeCard({ bike, go }: { bike: Bike; go: (p: string, id?: string
             Découvrir
             <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="text-[10px]" />
           </motion.button>
-
           <span className="shrink-0 text-[10px] font-bold uppercase tracking-[0.14em] text-black/55 dark:text-white/60">
-            {bike.price}
+            {bike.price ?? "Sur devis"}
           </span>
         </div>
       </div>
@@ -91,14 +89,13 @@ export function BikeCard({ bike, go }: { bike: Bike; go: (p: string, id?: string
   );
 }
 
-function partEyebrow(part: Part): string {
-  if (part.kind === "tvs") return `TVS / ${part.category ?? "Equipement"}`;
-  if (part.kind === "tld") return "Troy Lee Designs";
-  if (part.kind === "gaerne") return "Gaerne";
-  if (part.kind === "mt") return "MT Helmets";
-  if (part.kind === "bihr") return "BIHR";
-  if (part.compatibleBrand && part.compatibleBrand !== "Universal") return `Pièce ${part.compatibleBrand}`;
-  return "Pièce détachée";
+function partEyebrow(product: Product): string {
+  const brand = brandName(product);
+  if (product.categoryId === "pieces-detachees") {
+    return brand === "Marque non renseignée" ? "Pièce détachée" : `Pièce ${brand}`;
+  }
+  const type = productTypes.find((item) => item.id === product.productTypeId)?.name;
+  return type ? `${brand} / ${type}` : brand;
 }
 
 export function PartCard({
@@ -106,11 +103,12 @@ export function PartCard({
   go,
   onEnquire,
 }: {
-  part: Part;
+  part: Product;
   go?: (p: string, id?: string) => void;
-  onEnquire?: (part: Part) => void;
+  onEnquire?: (part: Product) => void;
 }) {
   const openDetail = () => go?.("accessory", part.id);
+  const image = mainProductImage(part);
 
   return (
     <motion.article
@@ -121,43 +119,27 @@ export function PartCard({
       transition={{ duration: 0.32, ease: "easeOut" }}
       className="fb-card group min-w-0 overflow-hidden p-1.5 sm:p-2"
     >
-      <button
-        type="button"
-        onClick={openDetail}
-        aria-label={`Voir les détails de ${part.name}`}
-        className="block w-full cursor-pointer text-left"
-      >
+      <button type="button" onClick={openDetail} aria-label={`Voir les détails de ${part.name}`} className="block w-full cursor-pointer text-left">
         <SmartImage
-          src={part.image}
-          alt={part.name}
+          src={image?.url ?? ""}
+          alt={image?.altText ?? part.name}
           className="fb-card-media-white aspect-square"
           imgClassName="object-contain p-2 transition-transform duration-500 group-hover:scale-105 sm:p-3"
         />
       </button>
       <div className="px-1 pb-1 pt-2.5">
-        <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#98741b] dark:text-[#ffd100]">
-          {partEyebrow(part)}
-        </p>
-        <button
-          type="button"
-          onClick={openDetail}
-          className="mt-1 block w-full cursor-pointer text-left"
-        >
-          <h3 className="line-clamp-2 text-xs font-semibold leading-5 text-[#171816] transition group-hover:underline dark:text-[#f2f0ea]">
-            {part.name}
-          </h3>
+        <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-[#98741b] dark:text-[#ffd100]">{partEyebrow(part)}</p>
+        <button type="button" onClick={openDetail} className="mt-1 block w-full cursor-pointer text-left">
+          <h3 className="line-clamp-2 text-xs font-semibold leading-5 text-[#171816] transition group-hover:underline dark:text-[#f2f0ea]">{part.name}</h3>
         </button>
-        <p className="mt-1.5 text-[10px] uppercase tracking-[0.1em] text-black/45 dark:text-white/45">{part.price}</p>
+        <p className="mt-1.5 text-[10px] uppercase tracking-[0.1em] text-black/45 dark:text-white/45">{part.price ?? "Sur devis"}</p>
         {onEnquire && (
           <button
             type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onEnquire(part);
-            }}
+            onClick={(e) => { e.stopPropagation(); onEnquire(part); }}
             className="mt-2.5 flex min-h-10 w-full items-center justify-between gap-1 border-t border-black/10 pt-2.5 text-left text-[10px] font-semibold uppercase tracking-[0.08em] text-black/55 transition hover:text-[#171816] dark:border-white/10 dark:text-white/55 dark:hover:text-white"
           >
-            Se renseigner <FontAwesomeIcon icon={faArrowRight} aria-hidden="true" />
+            Se renseigner <FontAwesomeIcon icon={faArrowRight} />
           </button>
         )}
       </div>

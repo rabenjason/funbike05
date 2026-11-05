@@ -1,5 +1,11 @@
-import { BIKES, TLD, TVS_PARTS, type Bike } from "../data";
+import { motorcycles, helmets, spareParts, brands } from "../data";
+import type { Product } from "../types/product";
 import { runRecommender, isSpecificModelRequest, detectBrandText, type NeedProfile } from "./recommender";
+
+const TROY_LEE_HELMETS = helmets.filter((product) => product.brandId === "troy-lee-designs");
+const TVS_COMPATIBLE_PARTS = spareParts.filter((product) => product.compatibleBrandIds?.includes("tvs"));
+type BikeFamily = "Off-road" | "Urbain" | "3 roues";
+const bikeBrand = (bike: Product) => brands.find((brand) => brand.id === bike.brandId)?.name ?? "Marque non renseignée";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -67,7 +73,7 @@ const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLower
 
 const pick = <T,>(list: T[]): T => list[Math.floor(Math.random() * list.length)];
 
-const byId = (id: string) => BIKES.find((b) => b.id === id);
+const byId = (id: string) => motorcycles.find((b) => b.id === id);
 
 /* ------------------------------------------------------------------ */
 /*  Shop facts (single source of truth for the assistant)              */
@@ -121,7 +127,7 @@ export function shopStatus(now = new Date()): { open: boolean; text: string } {
 /*  Catalogue understanding                                            */
 /* ------------------------------------------------------------------ */
 
-const FAMILY_WORDS: Record<Bike["family"], string[]> = {
+const FAMILY_WORDS: Record<BikeFamily, string[]> = {
   "Off-road": ["enduro", "cross", "motocross", "offroad", "off road", "tout terrain", "piste", "trail", "rallye", "competition", "boue", "terre", "hors piste", "sentier"],
   Urbain: ["ville", "urbain", "urbaine", "quotidien", "trajet", "bureau", "route", "econom", "consomm", "deplacement", "citadin", "roadster", "sportive urbaine"],
   "3 roues": ["tuktuk", "tuk", "3 roues", "trois roues", "taxi", "bajaj", "tricycle"],
@@ -134,14 +140,14 @@ const BRAND_WORDS: Record<string, string[]> = {
   Funbike: ["edition speciale", "serie limitee"],
 };
 
-const INDEX = BIKES.map((bike) => ({
+const INDEX = motorcycles.map((bike) => ({
   bike,
   name: norm(bike.name),
-  hay: norm(`${bike.name} ${bike.brand} ${bike.family} ${bike.desc} ${bike.specs.map((s) => s.value).join(" ")}`),
+  hay: norm(`${bike.name} ${bikeBrand(bike)} ${bike.family ?? ""} ${bike.description} ${bike.specifications.map((spec) => spec.value).join(" ")}`),
 }));
 
-function detectFamily(t: string): Bike["family"] | undefined {
-  return (Object.keys(FAMILY_WORDS) as Bike["family"][]).find((f) => hasAny(t, FAMILY_WORDS[f]));
+function detectFamily(t: string): BikeFamily | undefined {
+  return (Object.keys(FAMILY_WORDS) as BikeFamily[]).find((f) => hasAny(t, FAMILY_WORDS[f]));
 }
 
 function detectBrand(t: string): string | undefined {
@@ -153,7 +159,7 @@ const STOP = new Set(["moto", "motos", "pour", "avec", "vous", "avez", "est", "q
 /** Scores every bike against the question, best match first. */
 const MODEL_WORDS = ["apache", "raider", "hlx", "king", "tuktuk", "trail", "xx", "sef", "factory", "sport", "edition"];
 
-export function searchBikes(t: string): Bike[] {
+export function searchBikes(t: string): Product[] {
   const family = detectFamily(t);
   const brand = detectBrand(t);
   // "250", "125cc", "300 cm3"…
@@ -164,7 +170,7 @@ export function searchBikes(t: string): Bike[] {
 
   const scored = INDEX.map(({ bike, name, hay }) => {
     let score = 0;
-    if (brand && bike.brand === brand) score += 5;
+    if (brand && bikeBrand(bike) === brand) score += 5;
     MODEL_WORDS.forEach((kw) => {
       if (hasAny(t, [kw]) && new RegExp(`\\b${kw}`).test(name)) score += 6;
     });
@@ -187,7 +193,7 @@ export function searchBikes(t: string): Bike[] {
 }
 
 /** "la première", "la 2e", "celle-ci" … resolved against the last answer. */
-function resolveReference(t: string, mem: Memory): Bike | undefined {
+function resolveReference(t: string, mem: Memory): Product | undefined {
   if (!mem.lastIds.length) return undefined;
   const ordinals: [RegExp, number][] = [
     [/\b(premiere|1ere|1re|premier|1er)\b/, 0],
@@ -214,18 +220,18 @@ const SPEC_KEYS: { stems: string[]; label: string }[] = [
   { stems: ["consomm", "econom", "litre"], label: "consommation" },
 ];
 
-function specAnswer(bike: Bike, t: string): string | undefined {
+function specAnswer(bike: Product, t: string): string | undefined {
   for (const key of SPEC_KEYS) {
     if (!hasAny(t, key.stems)) continue;
-    const spec = bike.specs.find((s) => norm(s.label).includes(key.label));
-    if (spec) return `Sur la **${bike.name}**, ${spec.label.toLowerCase()} : **${spec.value}**.`;
+    const spec = bike.specifications.find((spec) => norm(spec.key).includes(key.label));
+    if (spec) return `Sur la **${bike.name}**, ${spec.key.toLowerCase()} : **${spec.value}**.`;
     return `Je n'ai pas cette information pour la **${bike.name}** dans ma fiche. L'équipe peut vous la confirmer.`;
   }
   return undefined;
 }
 
-function specList(bike: Bike): string {
-  return `Fiche **${bike.name}** :\n${bike.specs.map((s) => `• ${s.label} : ${s.value}`).join("\n")}`;
+function specList(bike: Product): string {
+  return `Fiche **${bike.name}** :\n${bike.specifications.map((spec) => `• ${spec.key} : ${spec.value}`).join("\n")}`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -272,7 +278,7 @@ export function initialQuick(): string[] {
   return DEFAULT_QUICK;
 }
 
-function withBikes(reply: BotReply, bikes: Bike[], mem: Memory, max = 4): BotReply {
+function withBikes(reply: BotReply, bikes: Product[], mem: Memory, max = 4): BotReply {
   const list = bikes.slice(0, max);
   mem.lastIds = list.map((b) => b.id);
   return { ...reply, productIds: list.map((b) => b.id) };
@@ -515,7 +521,7 @@ export function respond(raw: string, memIn: Memory): { reply: BotReply; memory: 
     return done({
       text: boots
         ? "Pour les bottes, nous travaillons avec **Gaerne** (tout-terrain et route). Donnez votre pointure et votre pratique, l'équipe vérifie la disponibilité."
-        : `Côté équipement pilote : **${TLD.length} références Troy Lee Designs**, des casques **MT Helmets**, des bottes **Gaerne** et des **casques, blousons et gants TVS**.`,
+        : `Côté équipement pilote : **${TROY_LEE_HELMETS.length} références Troy Lee Designs**, des casques **MT Helmets**, des bottes **Gaerne** et des **casques, blousons et gants TVS**.`,
       actions: [
         { label: boots ? "Voir Gaerne" : mt ? "Voir MT Helmets" : "Casques Troy Lee", page: "equipements", id: boots ? "gaerne" : mt ? "mt" : "tld", icon: "gear" },
         ...(boots ? [] : [{ label: "Équipements TVS", page: "equipements", id: "tvs", icon: "gear" as const }]),
@@ -529,7 +535,7 @@ export function respond(raw: string, memIn: Memory): { reply: BotReply; memory: 
     const requestedBrand = detectBrandText(t);
     if (requestedBrand === "TVS") {
       return done({
-        text: `La sélection **pièces détachées TVS** comprend notamment des pneus, kits chaîne, plaquettes et disques de frein, filtres, câbles et kits d’entretien (${TVS_PARTS.length} références simulées). Indiquez le modèle et l’année pour confirmer les dimensions et la compatibilité.`,
+        text: `La sélection **pièces détachées TVS** comprend notamment des pneus, kits chaîne, plaquettes et disques de frein, filtres, câbles et kits d’entretien (${TVS_COMPATIBLE_PARTS.length} références simulées). Indiquez le modèle et l’année pour confirmer les dimensions et la compatibilité.`,
         actions: [{ label: "Voir les pièces TVS", page: "spares", id: "spare-tvs", icon: "parts" }],
         quick: ["Pneu TVS", "Kit chaîne TVS", "Freinage TVS"],
       });
@@ -561,9 +567,9 @@ export function respond(raw: string, memIn: Memory): { reply: BotReply; memory: 
 
   /* --- Catalogue overview ------------------------------------------ */
   if (hasAny(t, I.catalog)) {
-    const count = (f: Bike["family"]) => BIKES.filter((b) => b.family === f).length;
+    const count = (f: BikeFamily) => motorcycles.filter((b) => b.family === f).length;
     return done({
-      text: `Notre catalogue compte **${BIKES.length} véhicules** :\n• ${count("Off-road")} motos off-road (Sherco, Fantic)\n• ${count("Urbain")} motos urbaines (TVS)\n• ${count("3 roues")} tuktuk 3 roues\nQuelle famille vous intéresse ?`,
+      text: `Notre catalogue compte **${motorcycles.length} véhicules** :\n• ${count("Off-road")} motos off-road (Sherco, Fantic)\n• ${count("Urbain")} motos urbaines (TVS)\n• ${count("3 roues")} tuktuk 3 roues\nQuelle famille vous intéresse ?`,
       quick: ["Enduro / off-road", "Motos TVS", "Tuktuk 3 roues"],
       actions: [{ label: "Voir le catalogue", page: "motos", icon: "catalog" }],
     });

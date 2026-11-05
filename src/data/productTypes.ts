@@ -8,6 +8,8 @@ export const productTypes = [
   { id: "tenues", name: "Tenues", categoryId: "equipements" },
   { id: "bottes", name: "Bottes", categoryId: "equipements" },
   { id: "protection", name: "Protections", categoryId: "equipements" },
+  { id: "blousons", name: "Blousons", categoryId: "equipements" },
+  { id: "gants", name: "Gants", categoryId: "equipements" },
   { id: "equipement-pilote", name: "Équipement pilote", categoryId: "equipements" },
   { id: "freinage", name: "Freinage", categoryId: "pieces-detachees" },
   { id: "transmission", name: "Transmission", categoryId: "pieces-detachees" },
