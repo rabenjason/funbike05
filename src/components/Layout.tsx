@@ -416,28 +416,3 @@ export function Section({
     </section>
   );
 }
-
-export function PageHeader({ title, subtitle }: { title: string; subtitle: string }) {
-  return (
-    <motion.section
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.32, ease: "easeOut" }}
-      className="page-header border-b border-black/10 bg-[#fff9df]/80 backdrop-blur-xl dark:border-white/10 dark:bg-[#1c1d19]/80"
-    >
-      <div className="mx-auto grid w-full max-w-(--container-site) gap-3 px-4 py-5 sm:px-6 sm:py-6 md:grid-cols-[1fr_0.7fr] md:items-end md:gap-6 md:px-8 lg:grid-cols-[1fr_0.55fr] lg:px-10 lg:py-8">
-        <div>
-          <p className="mb-1.5 text-[clamp(0.58rem,0.55rem+0.12vw,0.68rem)] font-bold uppercase tracking-[0.18em] text-[#a27b17] dark:text-[#ffd100]">
-            {content.sections.surTitrePage}
-          </p>
-          <h1 className="font-display text-[clamp(1.85rem,1.35rem+2.2vw,3.15rem)] font-semibold leading-[0.98] tracking-[-0.055em] text-[#171816] dark:text-[#f2f0ea]">
-            {title}
-          </h1>
-        </div>
-        <p className="max-w-md text-[clamp(0.78rem,0.74rem+0.18vw,0.9rem)] leading-5 text-black/55 dark:text-white/55 lg:justify-self-end">
-          {subtitle}
-        </p>
-      </div>
-    </motion.section>
-  );
-}
